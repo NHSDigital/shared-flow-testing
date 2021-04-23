@@ -1,0 +1,7 @@
+variables:
+  service_name: shared-flow-testing
+  short_service_name: sft
+  service_base_path: shared-flow-testing
+  product_display_name: Shared Flow Testing
+  product_description: This proxy only consumes shared flows.
+  spec_file: shared-flow-testing.json
