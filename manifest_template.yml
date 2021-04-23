@@ -21,9 +21,9 @@ APIGEE_ENVIRONMENTS:
 meta:
   api:
     name: shared-flow-testing
-    guid: e0f1d6cf-402f-493e-8a36-9abea3372000
+    guid: 3bf28d91-7109-4387-bf1a-e26f673eb0e8
     spec_guids:
-      - a062e000-b843-4833-8d24-8fc143490111
+      - fc17b6fe-c3c7-4801-8331-3f87c9f26e62
   schema_version: 1.1
 apigee:
   environments:
