@@ -20,12 +20,12 @@ steps:
       export JWT_PRIVATE_KEY_ABSOLUTE_PATH="$(Pipeline.Workspace)/secrets/$(JWT_TESTING_PRIVATE_KEY)"
       export APIGEE_API_TOKEN="$(secret.AccessToken)"
       pytest --reruns 5 --reruns-delay 1 -v --junitxml=test-report.xml
-    workingDirectory: $(Pipeline.Workspace)/s/${{ parameters.service_name }}/$(SERVICE_ARTIFACT_NAME)/api_tests
+    workingDirectory: $(Pipeline.Workspace)/s/${{ parameters.service_name }}/$(SERVICE_ARTIFACT_NAME)/tests
     displayName: Run integration tests
 
   - task: PublishTestResults@2
     displayName: 'Publish integration test results'
     condition: always()
     inputs:
-      testResultsFiles: '$(Pipeline.Workspace)/s/${{ parameters.service_name }}/$(SERVICE_ARTIFACT_NAME)/api_tests/test-report.xml'
+      testResultsFiles: '$(Pipeline.Workspace)/s/${{ parameters.service_name }}/$(SERVICE_ARTIFACT_NAME)/tests/test-report.xml'
       failTaskOnFailedTests: true
