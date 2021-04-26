@@ -1,4 +1,3 @@
-import json
 import pytest
 import requests
 from assertpy import assert_that
@@ -87,4 +86,3 @@ class TestEndpoints:
         assert_that(expected_error_description).is_equal_to(
             response.json()["error_description"]
         )
-
