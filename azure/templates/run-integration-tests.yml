@@ -1,0 +1,31 @@
+parameters:
+  - name: service_name
+    type: string
+
+steps:
+  - bash: |
+      pip install virtualenv
+      virtualenv test_env
+      source ./test_env/bin/activate
+      pip install -r requirements.txt
+    workingDirectory: $(Pipeline.Workspace)/s/${{ parameters.service_name }}/$(SERVICE_ARTIFACT_NAME)/tests
+    displayName: Setup integration tests
+
+  - bash: |
+      source ./test_env/bin/activate
+      export OAUTH_BASE_URI="https://$(APIGEE_ENVIRONMENT).api.service.nhs.uk"
+      export OAUTH_PROXY="oauth2"
+      export SERVICE_NAME="$(FULLY_QUALIFIED_SERVICE_NAME)"
+      export ID_TOKEN_PRIVATE_KEY_ABSOLUTE_PATH="$(Pipeline.Workspace)/secrets/$(ID_TOKEN_TESTING_PRIVATE_KEY)"
+      export JWT_PRIVATE_KEY_ABSOLUTE_PATH="$(Pipeline.Workspace)/secrets/$(JWT_TESTING_PRIVATE_KEY)"
+      export APIGEE_API_TOKEN="$(secret.AccessToken)"
+      pytest --reruns 5 --reruns-delay 1 -v --junitxml=test-report.xml
+    workingDirectory: $(Pipeline.Workspace)/s/${{ parameters.service_name }}/$(SERVICE_ARTIFACT_NAME)/tests
+    displayName: Run integration tests
+
+  - task: PublishTestResults@2
+    displayName: 'Publish integration test results'
+    condition: always()
+    inputs:
+      testResultsFiles: '$(Pipeline.Workspace)/s/${{ parameters.service_name }}/$(SERVICE_ARTIFACT_NAME)/tests/test-report.xml'
+      failTaskOnFailedTests: true

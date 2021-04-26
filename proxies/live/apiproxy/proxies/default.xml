@@ -1,5 +1,13 @@
 <ProxyEndpoint name="default">
   <Flows>
+    <Flow name="UserRoleService">
+      <Request>
+        <Step>
+            <Name>FlowCallout.UserRoleService</Name>
+        </Step>
+      </Request>
+      <Condition>proxy.pathsuffix MatchesPath "/user-role-service"</Condition>
+    </Flow>
     <Flow name="OptionsPreFlight">
       <Request/>
       <Response>
@@ -62,9 +70,9 @@
   <RouteRule name="shared-flow-testing-target">
     <TargetEndpoint>shared-flow-testing-target</TargetEndpoint>
   </RouteRule>
-  <DefaultFaultRule>
+  <!-- <DefaultFaultRule>
     <Step>
       <Name>AssignMessage.Errors.CatchAllMessage</Name>
     </Step>
-  </DefaultFaultRule>
+  </DefaultFaultRule> -->
 </ProxyEndpoint>
