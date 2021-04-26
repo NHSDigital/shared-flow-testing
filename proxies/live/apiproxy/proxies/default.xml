@@ -70,9 +70,9 @@
   <RouteRule name="shared-flow-testing-target">
     <TargetEndpoint>shared-flow-testing-target</TargetEndpoint>
   </RouteRule>
-  <DefaultFaultRule>
+  <!-- <DefaultFaultRule>
     <Step>
       <Name>AssignMessage.Errors.CatchAllMessage</Name>
     </Step>
-  </DefaultFaultRule>
+  </DefaultFaultRule> -->
 </ProxyEndpoint>

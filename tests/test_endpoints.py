@@ -1,4 +1,7 @@
+import json
 import pytest
+import requests
+from assertpy import assert_that
 from api_test_utils.oauth_helper import OauthHelper
 from api_test_utils.apigee_api_apps import ApigeeApiDeveloperApps
 from api_test_utils.apigee_api_products import ApigeeApiProducts
@@ -62,9 +65,26 @@ class TestEndpoints:
         assert token_resp["status_code"] == 200
         return token_resp['body']
 
-    def test_user_restricted(self, get_token):
-        """
-        In here you can add tests which call your proxy
-        You can use the 'get_token' fixture to call the proxy with a access token
-        """
-        pass
+    def test_user_invalid_role_in_header(self, get_token):
+        # Given
+        token = get_token['access_token']
+        expected_status_code = 400
+        expected_error = "invalid role"
+        expected_error_description = "nhsd-session-urid is invalid"
+
+        # When
+        response = requests.get(
+            url='https://internal-dev.api.service.nhs.uk/shared-flow-testing-pr-6/user-role-service',
+            headers={
+                "Authorization": f"Bearer {token}",
+                "NHSD-Session-URID": "notAuserRole123",
+            },
+        )
+
+        # Then
+        assert_that(expected_status_code).is_equal_to(response.status_code)
+        assert_that(expected_error).is_equal_to(response.json()["error"])
+        assert_that(expected_error_description).is_equal_to(
+            response.json()["error_description"]
+        )
+
