@@ -39,10 +39,10 @@ extends:
       - environment: internal-dev
         make_spec_visible: true
         post_deploy:
-          # - template: ./templates/run-smoke-tests.yml
-          - template: ./templates/run-integration-tests.yml
-            parameters:
-              service_name: ${{ variables.service_name }}   
+          - template: ./templates/run-smoke-tests.yml
+          # - template: ./templates/run-integration-tests.yml
+          #   parameters:
+          #     service_name: ${{ variables.service_name }}   
       # - environment: internal-dev-sandbox
       #   proxy_path: sandbox
       #   post_deploy:
