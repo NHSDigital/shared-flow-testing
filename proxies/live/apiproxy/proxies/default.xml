@@ -6,6 +6,11 @@
             <Name>FlowCallout.UserRoleService</Name>
         </Step>
       </Request>
+      <Response>
+        <Step>
+          <Name>AssignMessage.AddPayloadToPing</Name>
+        </Step>
+      </Response>
       <Condition>proxy.pathsuffix MatchesPath "/user-role-service"</Condition>
     </Flow>
     <Flow name="OptionsPreFlight">
@@ -66,6 +71,9 @@
   </RouteRule>
   <RouteRule name="NoRouteStatus">
     <Condition>(proxy.pathsuffix MatchesPath "/_status") and ((request.verb = "GET") or (request.verb = "HEAD"))</Condition>
+  </RouteRule>
+  <RouteRule name="NoRouteUserServiceRole">
+    <Condition>(proxy.pathsuffix MatchesPath "/user-service-role") and ((request.verb = "GET") or (request.verb = "HEAD"))</Condition>
   </RouteRule>
   <RouteRule name="shared-flow-testing-target">
     <TargetEndpoint>shared-flow-testing-target</TargetEndpoint>
