@@ -6,6 +6,11 @@
             <Name>FlowCallout.UserRoleService</Name>
         </Step>
       </Request>
+      <Response>
+        <Step>
+          <Name>AssignMessage.AddPayloadToPing</Name>
+        </Step>
+      </Response>
       <Condition>proxy.pathsuffix MatchesPath "/user-role-service"</Condition>
     </Flow>
     <Flow name="OptionsPreFlight">
