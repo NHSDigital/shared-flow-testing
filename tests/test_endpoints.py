@@ -9,7 +9,6 @@ from api_test_utils.apigee_api_products import ApigeeApiProducts
 
 
 class TestEndpoints:
-
     @pytest.fixture()
     def app(self):
         """
@@ -42,12 +41,13 @@ class TestEndpoints:
 
         await app.create_new_app()
 
-        await product.update_scopes([
-            "urn:nhsd:apim:app:level3:shared-flow-testing",
-            "urn:nhsd:apim:user-nhs-id:aal3:shared-flow-testing",
-            "urn:nhsd:apim:user-nhs-login:P9:shared-flow-testing",
-
-        ])
+        await product.update_scopes(
+            [
+                "urn:nhsd:apim:app:level3:shared-flow-testing",
+                "urn:nhsd:apim:user-nhs-id:aal3:shared-flow-testing",
+                "urn:nhsd:apim:user-nhs-login:P9:shared-flow-testing",
+            ]
+        )
         await app.add_api_product([product.name])
         await app.set_custom_attributes(
             {
@@ -69,11 +69,11 @@ class TestEndpoints:
         oauth = OauthHelper(
             client_id=test_app.client_id,
             client_secret=test_app.client_secret,
-            redirect_uri=test_app.callback_url
-            )
+            redirect_uri=test_app.callback_url,
+        )
         token_resp = await oauth.get_token_response(grant_type="authorization_code")
         assert token_resp["status_code"] == 200
-        return token_resp['body']
+        return token_resp["body"]
 
     @pytest.fixture()
     async def get_token_client_credentials(self, test_app_and_product):
@@ -82,14 +82,14 @@ class TestEndpoints:
         oauth = OauthHelper(
             client_id=test_app.client_id,
             client_secret=test_app.client_secret,
-            redirect_uri=test_app.callback_url
-            )
+            redirect_uri=test_app.callback_url,
+        )
         jwt = oauth.create_jwt(kid="test-1")
         token_resp = await oauth.get_token_response(
             grant_type="client_credentials", _jwt=jwt
         )
         assert token_resp["status_code"] == 200
-        return token_resp['body']
+        return token_resp["body"]
 
     @pytest.fixture()
     async def get_token_nhs_login_token_exchange(self, test_app_and_product):
@@ -98,22 +98,21 @@ class TestEndpoints:
         oauth = OauthHelper(
             client_id=test_app.client_id,
             client_secret=test_app.client_secret,
-            redirect_uri=test_app.callback_url
-            )
+            redirect_uri=test_app.callback_url,
+        )
 
         id_token_claims = {
-            'aud': 'tf_-APIM-1',
-            'id_status': 'verified',
-            'token_use': 'id',
-            'auth_time': 1616600683,
-            'iss': 'https://internal-dev.api.service.nhs.uk',
-            'vot': 'P9.Cp.Cd',
-            'exp': int(time()) + 600,
-            'iat': int(time()) - 10,
-            'vtm': 'https://auth.sandpit.signin.nhs.uk/trustmark/auth.sandpit.signin.nhs.uk',
-            'jti': 'b68ddb28-e440-443d-8725-dfe0da330118',
-            'identity_proofing_level': 'P9'
-
+            "aud": "tf_-APIM-1",
+            "id_status": "verified",
+            "token_use": "id",
+            "auth_time": 1616600683,
+            "iss": "https://internal-dev.api.service.nhs.uk",
+            "vot": "P9.Cp.Cd",
+            "exp": int(time()) + 600,
+            "iat": int(time()) - 10,
+            "vtm": "https://auth.sandpit.signin.nhs.uk/trustmark/auth.sandpit.signin.nhs.uk",
+            "jti": "b68ddb28-e440-443d-8725-dfe0da330118",
+            "identity_proofing_level": "P9",
         }
         id_token_headers = {
             "sub": "49f470a1-cc52-49b7-beba-0f9cec937c46",
@@ -124,37 +123,42 @@ class TestEndpoints:
             "exp": 1616604574,
             "iat": 1616600974,
             "alg": "RS512",
-            "jti": "b68ddb28-e440-443d-8725-dfe0da330118"
+            "jti": "b68ddb28-e440-443d-8725-dfe0da330118",
         }
         with open(config.ID_TOKEN_NHS_LOGIN_PRIVATE_KEY_ABSOLUTE_PATH, "r") as f:
             contents = f.read()
 
         client_assertion_jwt = oauth.create_jwt(kid="test-1")
-        id_token_jwt = oauth.create_id_token_jwt(algorithm='RS512', claims=id_token_claims, headers=id_token_headers, signing_key=contents)
+        id_token_jwt = oauth.create_id_token_jwt(
+            algorithm="RS512",
+            claims=id_token_claims,
+            headers=id_token_headers,
+            signing_key=contents,
+        )
 
         # When
         token_resp = await oauth.get_token_response(
             grant_type="token_exchange",
             data={
-                'grant_type': 'urn:ietf:params:oauth:grant-type:token-exchange',
-                'subject_token_type': 'urn:ietf:params:oauth:token-type:id_token',
-                'client_assertion_type': 'urn:ietf:params:oauth:client-assertion-type:jwt-bearer',
-                'subject_token': id_token_jwt,
-                'client_assertion': client_assertion_jwt
-            }
+                "grant_type": "urn:ietf:params:oauth:grant-type:token-exchange",
+                "subject_token_type": "urn:ietf:params:oauth:token-type:id_token",
+                "client_assertion_type": "urn:ietf:params:oauth:client-assertion-type:jwt-bearer",
+                "subject_token": id_token_jwt,
+                "client_assertion": client_assertion_jwt,
+            },
         )
         assert token_resp["status_code"] == 200
-        return token_resp['body']
+        return token_resp["body"]
 
     @pytest.mark.asyncio
     async def test_happy_path(self, get_token):
         # Given
-        token = get_token['access_token']
+        token = get_token["access_token"]
         expected_status_code = 200
 
         # When
         response = requests.get(
-            url='https://internal-dev.api.service.nhs.uk/shared-flow-testing/user-role-service',
+            url="https://internal-dev.api.service.nhs.uk/shared-flow-testing/user-role-service",
             headers={
                 "Authorization": f"Bearer {token}",
                 "NHSD-Session-URID": "555254242102",
@@ -167,12 +171,12 @@ class TestEndpoints:
     @pytest.mark.asyncio
     async def test_default_role(self, get_token):
         # Given
-        token = get_token['access_token']
+        token = get_token["access_token"]
         expected_status_code = 200
 
         # When
         response = requests.get(
-            url='https://internal-dev.api.service.nhs.uk/shared-flow-testing/user-role-service',
+            url="https://internal-dev.api.service.nhs.uk/shared-flow-testing/user-role-service",
             headers={"Authorization": f"Bearer {token}"},
         )
         # Then
@@ -181,14 +185,14 @@ class TestEndpoints:
     @pytest.mark.asyncio
     async def test_user_invalid_role_in_header(self, get_token):
         # Given
-        token = get_token['access_token']
+        token = get_token["access_token"]
         expected_status_code = 400
         expected_error = "invalid role"
         expected_error_description = "nhsd-session-urid is invalid"
 
         # When
         response = requests.get(
-            url='https://internal-dev.api.service.nhs.uk/shared-flow-testing/user-role-service',
+            url="https://internal-dev.api.service.nhs.uk/shared-flow-testing/user-role-service",
             headers={
                 "Authorization": f"Bearer {token}",
                 "NHSD-Session-URID": "notAuserRole123",
@@ -204,7 +208,7 @@ class TestEndpoints:
 
     @pytest.mark.asyncio
     async def test_no_role_provided(self, get_token_client_credentials):
-        token = get_token_client_credentials['access_token']
+        token = get_token_client_credentials["access_token"]
         # Given
         expected_status_code = 400
         expected_error = "invalid role"
@@ -212,7 +216,7 @@ class TestEndpoints:
 
         # When
         response = requests.get(
-            url='https://internal-dev.api.service.nhs.uk/shared-flow-testing/user-role-service',
+            url="https://internal-dev.api.service.nhs.uk/shared-flow-testing/user-role-service",
             headers={"Authorization": f"Bearer {token}"},
         )
         # Then
@@ -223,8 +227,10 @@ class TestEndpoints:
         )
 
     @pytest.mark.asyncio
-    async def test_nhs_login_exchanged_token_no_role_provided(self, get_token_nhs_login_token_exchange):
-        token = get_token_nhs_login_token_exchange['access_token']
+    async def test_nhs_login_exchanged_token_no_role_provided(
+        self, get_token_nhs_login_token_exchange
+    ):
+        token = get_token_nhs_login_token_exchange["access_token"]
         # Given
         expected_status_code = 400
         expected_error = "invalid role"
@@ -232,7 +238,7 @@ class TestEndpoints:
 
         # When
         response = requests.get(
-            url='https://internal-dev.api.service.nhs.uk/shared-flow-testing/user-role-service',
+            url="https://internal-dev.api.service.nhs.uk/shared-flow-testing/user-role-service",
             headers={"Authorization": f"Bearer {token}"},
         )
         # Then
