@@ -110,7 +110,6 @@ class TestEndpoints:
             response.json()["error_description"]
         )
 
-
     # def test_no_role_provided(self, get_token_client_credentials):
     #     token = get_token_client_credentials['access_token']
     #     # Given
