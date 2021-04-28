@@ -55,4 +55,4 @@ test:
 
 smoketest:
 #	this target is for end to end smoketests this would be run 'post deploy' to verify an environment is working
-	poetry run pytest -v api_tests.py --junitxml=smoketest-report.xml -s
+	poetry run pytest -v tests/api_tests.py --junitxml=smoketest-report.xml -s
