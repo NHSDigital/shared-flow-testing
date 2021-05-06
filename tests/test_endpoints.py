@@ -158,7 +158,7 @@ class TestEndpoints:
 
         # When
         response = requests.get(
-            url="https://internal-dev.api.service.nhs.uk/shared-flow-testing/user-role-service",
+            url="https://internal-dev.api.service.nhs.uk/shared-flow-testing-pr-11/user-role-service",
             headers={
                 "Authorization": f"Bearer {token}",
                 "NHSD-Session-URID": "555254242102",
@@ -176,7 +176,7 @@ class TestEndpoints:
 
         # When
         response = requests.get(
-            url="https://internal-dev.api.service.nhs.uk/shared-flow-testing/user-role-service",
+            url="https://internal-dev.api.service.nhs.uk/shared-flow-testing-pr-11/user-role-service",
             headers={"Authorization": f"Bearer {token}"},
         )
         # Then
@@ -187,12 +187,12 @@ class TestEndpoints:
         # Given
         token = get_token["access_token"]
         expected_status_code = 400
-        expected_error = "invalid role"
+        expected_error = "Bad Request"
         expected_error_description = "nhsd-session-urid is invalid"
 
         # When
         response = requests.get(
-            url="https://internal-dev.api.service.nhs.uk/shared-flow-testing/user-role-service",
+            url="https://internal-dev.api.service.nhs.uk/shared-flow-testing-pr-11/user-role-service",
             headers={
                 "Authorization": f"Bearer {token}",
                 "NHSD-Session-URID": "notAuserRole123",
@@ -201,30 +201,26 @@ class TestEndpoints:
 
         # Then
         assert_that(expected_status_code).is_equal_to(response.status_code)
-        assert_that(expected_error).is_equal_to(response.json()["error"])
-        assert_that(expected_error_description).is_equal_to(
-            response.json()["error_description"]
-        )
+        assert_that(expected_error).is_equal_to(response.json()["issue"][0]["details"]["coding"][0]["display"])
+        assert_that(expected_error_description).is_equal_to(response.json()["issue"][0]["diagnostics"])
 
     @pytest.mark.asyncio
     async def test_no_role_provided(self, get_token_client_credentials):
         token = get_token_client_credentials["access_token"]
         # Given
         expected_status_code = 400
-        expected_error = "invalid role"
+        expected_error = "Bad Request"
         expected_error_description = "selected_roleid is missing in your token"
 
         # When
         response = requests.get(
-            url="https://internal-dev.api.service.nhs.uk/shared-flow-testing/user-role-service",
+            url="https://internal-dev.api.service.nhs.uk/shared-flow-testing-pr-11/user-role-service",
             headers={"Authorization": f"Bearer {token}"},
         )
         # Then
         assert_that(expected_status_code).is_equal_to(response.status_code)
-        assert_that(expected_error).is_equal_to(response.json()["error"])
-        assert_that(expected_error_description).is_equal_to(
-            response.json()["error_description"]
-        )
+        assert_that(expected_error).is_equal_to(response.json()["issue"][0]["details"]["coding"][0]["display"])
+        assert_that(expected_error_description).is_equal_to(response.json()["issue"][0]["diagnostics"])
 
     @pytest.mark.asyncio
     async def test_nhs_login_exchanged_token_no_role_provided(
@@ -233,17 +229,16 @@ class TestEndpoints:
         token = get_token_nhs_login_token_exchange["access_token"]
         # Given
         expected_status_code = 400
-        expected_error = "invalid role"
+        expected_error = "Bad Request"
         expected_error_description = "selected_roleid is missing in your token"
 
         # When
         response = requests.get(
-            url="https://internal-dev.api.service.nhs.uk/shared-flow-testing/user-role-service",
+            url="https://internal-dev.api.service.nhs.uk/shared-flow-testing-pr-11/user-role-service",
             headers={"Authorization": f"Bearer {token}"},
         )
         # Then
         assert_that(expected_status_code).is_equal_to(response.status_code)
-        assert_that(expected_error).is_equal_to(response.json()["error"])
-        assert_that(expected_error_description).is_equal_to(
-            response.json()["error_description"]
-        )
+        assert_that(expected_error).is_equal_to(response.json()["issue"][0]["details"]["coding"][0]["display"])
+        assert_that(expected_error_description).is_equal_to(response.json()["issue"][0]["diagnostics"])
+
