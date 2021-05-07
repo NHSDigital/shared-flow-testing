@@ -3,5 +3,5 @@
     <DisplayName>FlowCallout.UserRoleService</DisplayName>
     <FaultRules/>
     <Properties/>
-    <SharedFlowBundle>UserRoleService-testing</SharedFlowBundle>
+    <SharedFlowBundle>UserRoleService</SharedFlowBundle>
 </FlowCallout>
