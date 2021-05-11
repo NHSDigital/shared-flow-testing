@@ -6,6 +6,7 @@ from .configuration import config
 from api_test_utils.oauth_helper import OauthHelper
 from api_test_utils.apigee_api_apps import ApigeeApiDeveloperApps
 from api_test_utils.apigee_api_products import ApigeeApiProducts
+from api_test_utils.apigee_api_trace import ApigeeApiTraceDebug
 
 
 class TestEndpoints:
@@ -33,6 +34,14 @@ class TestEndpoints:
                 - Update custom ratelimits
         """
         return ApigeeApiProducts()
+
+    @pytest.fixture()
+    def debug(self):
+        """
+        Import the test utils module to be able to:
+            - Use the trace tool and get context variables after making a request to Apigee
+        """
+        return ApigeeApiTraceDebug(proxy='shared-flow-testing-internal-dev')
 
     @pytest.fixture()
     async def test_app_and_product(self, app, product):
@@ -183,12 +192,13 @@ class TestEndpoints:
         assert_that(expected_status_code).is_equal_to(response.status_code)
 
     @pytest.mark.asyncio
-    async def test_user_invalid_role_in_header(self, get_token):
+    async def test_user_invalid_role_in_header(self, get_token, debug):
         # Given
         token = get_token["access_token"]
         expected_status_code = 400
         expected_error = "Bad Request"
         expected_error_description = "nhsd-session-urid is invalid"
+        await debug.start_trace()
 
         # When
         response = requests.get(
@@ -198,46 +208,54 @@ class TestEndpoints:
                 "NHSD-Session-URID": "notAuserRole123",
             },
         )
+        isSharedFlowError = await debug.get_apigee_variable_from_trace(name='isSharedFlowError')
 
         # Then
+        assert_that(isSharedFlowError).is_equal_to('true')
         assert_that(expected_status_code).is_equal_to(response.status_code)
         assert_that(expected_error).is_equal_to(response.json()["issue"][0]["details"]["coding"][0]["display"])
         assert_that(expected_error_description).is_equal_to(response.json()["issue"][0]["diagnostics"])
 
     @pytest.mark.asyncio
-    async def test_no_role_provided(self, get_token_client_credentials):
+    async def test_no_role_provided(self, get_token_client_credentials, debug):
         token = get_token_client_credentials["access_token"]
         # Given
         expected_status_code = 400
         expected_error = "Bad Request"
         expected_error_description = "selected_roleid is missing in your token"
+        await debug.start_trace()
 
         # When
         response = requests.get(
             url="https://internal-dev.api.service.nhs.uk/shared-flow-testing/user-role-service",
             headers={"Authorization": f"Bearer {token}"},
         )
+        isSharedFlowError = await debug.get_apigee_variable_from_trace(name='isSharedFlowError')
         # Then
+        assert_that(isSharedFlowError).is_equal_to('true')
         assert_that(expected_status_code).is_equal_to(response.status_code)
         assert_that(expected_error).is_equal_to(response.json()["issue"][0]["details"]["coding"][0]["display"])
         assert_that(expected_error_description).is_equal_to(response.json()["issue"][0]["diagnostics"])
 
     @pytest.mark.asyncio
     async def test_nhs_login_exchanged_token_no_role_provided(
-        self, get_token_nhs_login_token_exchange
+        self, get_token_nhs_login_token_exchange, debug
     ):
         token = get_token_nhs_login_token_exchange["access_token"]
         # Given
         expected_status_code = 400
         expected_error = "Bad Request"
         expected_error_description = "selected_roleid is missing in your token"
+        await debug.start_trace()
 
         # When
         response = requests.get(
             url="https://internal-dev.api.service.nhs.uk/shared-flow-testing/user-role-service",
             headers={"Authorization": f"Bearer {token}"},
         )
+        isSharedFlowError = await debug.get_apigee_variable_from_trace(name='isSharedFlowError')
         # Then
+        assert_that(isSharedFlowError).is_equal_to('true')
         assert_that(expected_status_code).is_equal_to(response.status_code)
         assert_that(expected_error).is_equal_to(response.json()["issue"][0]["details"]["coding"][0]["display"])
         assert_that(expected_error_description).is_equal_to(response.json()["issue"][0]["diagnostics"])
