@@ -6,4 +6,4 @@ pyjwt
 python-dotenv
 assertpy
 pytest-rerunfailures
-https://github.com/NHSDigital/apim-test-utils/releases/download/v1.0.86-alpha/api_test_utils-1.0.86a0-py3-none-any.whl
+https://github.com/NHSDigital/apim-test-utils/releases/download/v1.1.3-alpha/api_test_utils-1.1.3a0-py3-none-any.whl
