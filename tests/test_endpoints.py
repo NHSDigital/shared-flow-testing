@@ -260,7 +260,7 @@ class TestEndpoints:
         assert_that(expected_error).is_equal_to(response.json()["issue"][0]["details"]["coding"][0]["display"])
         assert_that(expected_error_description).is_equal_to(response.json()["issue"][0]["diagnostics"])
 
-    @pytest.fixture()
+    @pytest.mark.asyncio
     async def test_no_role_id_on_id_token(self, test_app_and_product):
         """Call identity server to get an access token"""
         test_product, test_app = test_app_and_product
