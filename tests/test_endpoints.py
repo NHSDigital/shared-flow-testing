@@ -208,7 +208,7 @@ class TestEndpoints:
                 "NHSD-Session-URID": "notAuserRole123",
             },
         )
-        isSharedFlowError = await debug.get_apigee_variable_from_trace(name='isSharedFlowError')
+        isSharedFlowError = await debug.get_apigee_variable_from_trace(name='sharedFlow.userRoleError')
 
         # Then
         assert_that(isSharedFlowError).is_equal_to('true')
@@ -230,7 +230,7 @@ class TestEndpoints:
             url="https://internal-dev.api.service.nhs.uk/shared-flow-testing/user-role-service",
             headers={"Authorization": f"Bearer {token}"},
         )
-        isSharedFlowError = await debug.get_apigee_variable_from_trace(name='isSharedFlowError')
+        isSharedFlowError = await debug.get_apigee_variable_from_trace(name='sharedFlow.userRoleError')
         # Then
         assert_that(isSharedFlowError).is_equal_to('true')
         assert_that(expected_status_code).is_equal_to(response.status_code)
@@ -253,7 +253,7 @@ class TestEndpoints:
             url="https://internal-dev.api.service.nhs.uk/shared-flow-testing/user-role-service",
             headers={"Authorization": f"Bearer {token}"},
         )
-        isSharedFlowError = await debug.get_apigee_variable_from_trace(name='isSharedFlowError')
+        isSharedFlowError = await debug.get_apigee_variable_from_trace(name='sharedFlow.userRoleError')
         # Then
         assert_that(isSharedFlowError).is_equal_to('true')
         assert_that(expected_status_code).is_equal_to(response.status_code)
@@ -263,6 +263,9 @@ class TestEndpoints:
     @pytest.mark.asyncio
     async def test_no_role_id_on_id_token(self, test_app_and_product):
         """Call identity server to get an access token"""
+        #Given
+        expected_status_code = 400
+
         test_product, test_app = test_app_and_product
         oauth = OauthHelper(
             client_id=test_app.client_id,
@@ -273,5 +276,13 @@ class TestEndpoints:
         token_resp = await oauth.get_token_response(
             grant_type="client_credentials", _jwt=jwt
         )
-        assert token_resp["status_code"] == 400
-        return token_resp["body"]
+        #When
+        response = requests.get(
+            url="https://internal-dev.api.service.nhs.uk/shared-flow-testing/user-role-service",
+            headers={
+                "Authorization": f"Bearer {token_resp['body']['access_token']}",
+                "NHSD-Session-URID": "123456789",
+            },
+        )
+        #Then
+        assert_that(expected_status_code).is_equal_to(response.status_code)
