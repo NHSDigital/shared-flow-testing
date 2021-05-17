@@ -263,7 +263,7 @@ class TestEndpoints:
     @pytest.mark.asyncio
     async def test_no_role_id_on_id_token(self, test_app_and_product):
         """Call identity server to get an access token"""
-        #Given
+        # Given
         expected_status_code = 400
 
         test_product, test_app = test_app_and_product
@@ -276,7 +276,7 @@ class TestEndpoints:
         token_resp = await oauth.get_token_response(
             grant_type="client_credentials", _jwt=jwt
         )
-        #When
+        # When
         response = requests.get(
             url="https://internal-dev.api.service.nhs.uk/shared-flow-testing/user-role-service",
             headers={
@@ -284,5 +284,5 @@ class TestEndpoints:
                 "NHSD-Session-URID": "123456789",
             },
         )
-        #Then
+        # Then
         assert_that(expected_status_code).is_equal_to(response.status_code)
