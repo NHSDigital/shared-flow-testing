@@ -259,3 +259,20 @@ class TestEndpoints:
         assert_that(expected_status_code).is_equal_to(response.status_code)
         assert_that(expected_error).is_equal_to(response.json()["issue"][0]["details"]["coding"][0]["display"])
         assert_that(expected_error_description).is_equal_to(response.json()["issue"][0]["diagnostics"])
+
+
+    @pytest.fixture()
+    async def test_no_role_id_on_id_token(self, test_app_and_product):
+        """Call identity server to get an access token"""
+        test_product, test_app = test_app_and_product
+        oauth = OauthHelper(
+            client_id=test_app.client_id,
+            client_secret=test_app.client_secret,
+            redirect_uri=test_app.callback_url,
+        )
+        jwt = oauth.create_jwt(kid="test-1")
+        token_resp = await oauth.get_token_response(
+            grant_type="client_credentials", _jwt=jwt
+        )
+        assert token_resp["status_code"] == 400
+        return token_resp["body"]
