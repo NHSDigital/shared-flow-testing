@@ -275,4 +275,3 @@ class TestEndpoints:
         )
         assert token_resp["status_code"] == 400
         return token_resp["body"]
-        
