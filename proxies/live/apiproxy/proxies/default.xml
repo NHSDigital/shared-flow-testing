@@ -50,7 +50,7 @@
       <Condition>(proxy.pathsuffix MatchesPath "/_status") and ((request.verb = "GET") or (request.verb = "HEAD"))
       </Condition>
     </Flow>
-    <Flow>
+    <Flow name="SplunkTestEndpoint">
       <Response>
         <Step>
           <Name>AssignMessage.AddPayloadToSplunkTest</Name>
