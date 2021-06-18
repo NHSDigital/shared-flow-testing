@@ -83,11 +83,11 @@
   <RouteRule name="NoRouteUserServiceRole">
     <Condition>(proxy.pathsuffix MatchesPath "/user-role-service") and ((request.verb = "GET") or (request.verb = "HEAD"))</Condition>
   </RouteRule>
-  <RouteRule name="shared-flow-testing-target">
-    <TargetEndpoint>shared-flow-testing-target</TargetEndpoint>
-  </RouteRule>
   <RouteRule name="NoRouteSplunkTest">
     <Condition>(proxy.pathsuffix MatchesPath "/splunk-test") and ((request.verb = "GET") or (request.verb = "HEAD"))</Condition>
+  </RouteRule>
+  <RouteRule name="shared-flow-testing-target">
+    <TargetEndpoint>shared-flow-testing-target</TargetEndpoint>
   </RouteRule>
   <DefaultFaultRule>
     <Step>
