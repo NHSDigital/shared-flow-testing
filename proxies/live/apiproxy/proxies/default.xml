@@ -50,12 +50,20 @@
       <Condition>(proxy.pathsuffix MatchesPath "/_status") and ((request.verb = "GET") or (request.verb = "HEAD"))
       </Condition>
     </Flow>
+    <Flow>
+      <Response>
+        <Step>
+          <Name>AssignMessage.AddPayloadToSplunkTest</Name>
+        </Step>
+      </Response>
+      <Condition>(proxy.pathsuffix MatchesPath "/splunk-test") and ((request.verb = "GET") or (request.verb = "HEAD"))</Condition>
+    </Flow>
   </Flows>
   <PreFlow/>
   <PostClientFlow name="PostClientFlow">
     <Response>
       <Step>
-        <Name>FlowCallout.LogToSplunk</Name>
+        <Name>ServiceCallout.LogToSplunk</Name>
       </Step>
     </Response>
   </PostClientFlow>
@@ -77,6 +85,9 @@
   </RouteRule>
   <RouteRule name="shared-flow-testing-target">
     <TargetEndpoint>shared-flow-testing-target</TargetEndpoint>
+  </RouteRule>
+  <RouteRule name="NoRouteSplunkTest">
+    <Condition>(proxy.pathsuffix MatchesPath "/splunk-test") and ((request.verb = "GET") or (request.verb = "HEAD"))</Condition>
   </RouteRule>
   <DefaultFaultRule>
     <Step>

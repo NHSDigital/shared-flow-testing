@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<ServiceCallout async="false" continueOnError="false" enabled="true" name="ServiceCallout.LogToSplunk">
+    <DisplayName>ServiceCallout.LogToSplunk</DisplayName>
+    <Properties/>
+    <Request clearPayload="true" variable="splunkCalloutRequest">
+        <IgnoreUnresolvedVariables>true</IgnoreUnresolvedVariables>
+        <Set>
+            <Headers>
+                <Header name="Authorization">Splunk {private.common.splunk_hec_token}</Header>
+            </Headers>
+            <QueryParams>
+                <QueryParam name="index">{private.common.splunk_index}</QueryParam>
+                <QueryParam name="host">apigee:{virtualhost.name}</QueryParam>
+                <QueryParam name="time">{client.received.start.timestamp}</QueryParam>
+                <QueryParam name="sourcetype">apm-apigee-json</QueryParam>
+                <QueryParam name="source">apigee:{organization.name}:{environment.name}:{apiproxy.name}:{apiproxy.revision}</QueryParam>
+            </QueryParams>
+            <!--  this payload should be a single line, carriage returns will break the raw splunk log -->
+            <Payload contentType="application/json" variablePrefix="%" variableSuffix="#">{"messageID":"%messageid#","client":{"ip":"%client.ip#","received_start":"%client.received.start.timestamp#","received_end":"%client.received.end.timestamp#","sent_start":"%client.sent.start.timestamp#","sent_end":"%client.sent.end.timestamp#","user_agent":"%escapeJSON(request-data-for-splunk.header.User-Agent)#"},"request":{"uri":"%escapeJSON(request-data-for-splunk.uri)#","verb":"%escapeJSON(request-data-for-splunk.verb)#","content_type":"%escapeJSON(request-data-for-splunk.header.Content-Type)#","content_length":"%client.received.content.length#","content_encoding":"%escapeJSON(request-data-for-splunk.header.Content-Encoding)#","requestID":"%escapeJSON(request-data-for-splunk.header.X-Request-ID)#","correlationID":"%escapeJSON(request-data-for-splunk.header.X-Correlation-ID)#","host":"%escapeJSON(request-data-for-splunk.header.Host)#","port":"%escapeJSON(request-data-for-splunk.header.X-Forwarded-Port)#","uri_path":"%escapeJSON(request-data-for-splunk.path)#","uri_params":"%escapeJSON(request-data-for-splunk.querystring)#"},"meta":{"organization":"%organization.name#","api_guid":"%apim.api_guid#","api_spec_guid":"%apim.api_spec_guid#","product":"%escapeJSON(apigee.apiproduct.name)#","application":"%escapeJSON(apigee.developer.app.name)#","env":"%environment.name#","client_id":"%escapeJSON(apigee.client_id)#","application_id":"%developer.app.id#","ASID":"%app.asid#"},"proxy":{"name":"%apiproxy.name#","revision":"%apiproxy.revision#","basepath":"%proxy.basepath#","suffix":"%escapeJSON(proxy.pathsuffix)#"},"auth":{"id_token_acr":"%escapeJSON(accesstoken.id_token-acr)#","grant_type":"%escapeJSON(grant_type)#","authorization":"%escapeJSON(status)#","id_token_subject":"%escapeJSON(accesstoken.id_token-subject)#","id_token_issuer":"%escapeJSON(accesstoken.id_token-issuer)#","scope":"%escapeJSON(scope)#"},"target":{"host":"%target.host#","status_code":"%target.response.status.code#","content_length":"%target.received.content.length#","received_start":"%target.received.start.timestamp#","received_end":"%target.received.end.timestamp#","sent_start":"%target.sent.start.timestamp#","sent_end":"%target.sent.end.timestamp#","port":"%target.port#"},"error":{"is_error":"%is.error#","is_policy_error":"%apigee.edge.execution.is_policy_error#","is_target_error":"%apigee.edge.execution.is_target_error#","policy_error_policy_name":"%apigee.edge.execution.fault_policy_name#","policy_error_flow_name":"%apigee.edge.execution.fault_flow_name#","error":"%error#","content":"%escapeJSON(error.content)#","message":"%escapeJSON(error.message)#","status_code":"%error.status.code#","reason_phrase":"%escapeJSON(error.reason.phrase)#","transport_message":"%escapeJSON(error.transport.message)#","state":"%error.state#"},"response":{"status_code":"%response.status.code#","content_type":"%escapeJSON(response.header.Content-Type)#","content_length":"%escapeJSON(response.header.Content-Length)#","content_encoding":"%escapeJSON(response.header.Content-Encoding)#","content_body":"%escapeJSON(status.response)#"}}</Payload>
+            <Verb>POST</Verb>
+        </Set>
+    </Request>
+    <Response>splunkCalloutResponse</Response>
+    <Timeout>30000</Timeout>
+    <HTTPTargetConnection>
+        <LoadBalancer>
+            <Server name="splunk-cloud-hec"/>
+        </LoadBalancer>
+        <Path>services/collector/raw</Path>
+    </HTTPTargetConnection>
+</ServiceCallout>
