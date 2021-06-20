@@ -51,6 +51,11 @@
       </Condition>
     </Flow>
     <Flow name="SplunkTestEndpoint">
+      <Request>
+        <Step>
+          <Name>OauthV2.VerifyAccessToken</Name>
+        </Step>
+      </Request>
       <Response>
         <Step>
           <Name>AssignMessage.AddPayloadToSplunkTest</Name>
