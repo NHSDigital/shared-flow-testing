@@ -11,11 +11,10 @@ class TestSplunkLogging:
 
     async def _get_auth_from_splunk_payload(self, debug):
         splunk_content_json = await debug.get_apigee_variable_from_trace(name='splunkCalloutRequest.content')
-        return json.loads(splunk_content_json)["auth"]
+        return json.loads(splunk_content_json)["auth"]["meta"]
 
     @pytest.mark.splunk
     @pytest.mark.asyncio
-    @pytest.mark.debug
     async def test_splunk_auth_with_client_credentials(self, get_token_client_credentials, debug):
         # Given
         token = get_token_client_credentials["access_token"]
@@ -29,7 +28,10 @@ class TestSplunkLogging:
         auth = await self._get_auth_from_splunk_payload(debug)
 
         # Then
-        print(auth)
+        assert auth["auth_type"] == "app"
+        assert auth["grant_type"] == "client_credentials"
+        assert auth["level"] == "level3"
+        assert auth["provider"] == "apim"
 
     @pytest.mark.splunk
     @pytest.mark.asyncio
@@ -46,7 +48,10 @@ class TestSplunkLogging:
         auth = await self._get_auth_from_splunk_payload(debug)
 
         # Then
-        print(auth)
+        assert auth["auth_type"] == "user"
+        assert auth["grant_type"] == "authorization_code"
+        assert auth["level"] == "aal3"
+        assert auth["provider"] == "nhs-cis2"
 
     @pytest.mark.splunk
     @pytest.mark.asyncio
@@ -63,10 +68,14 @@ class TestSplunkLogging:
         auth = await self._get_auth_from_splunk_payload(debug)
 
         # Then
-        print(auth)
+        assert auth["auth_type"] == "user"
+        assert auth["grant_type"] == "token_exchange"
+        assert auth["level"] == "aal3"
+        assert auth["provider"] == "nhs-cis2"
 
     @pytest.mark.splunk
     @pytest.mark.asyncio
+    @pytest.mark.debug
     async def test_splunk_auth_with_nhs_login_token_exchange(self, get_token_nhs_login_token_exchange, debug):
         # Given
         token = get_token_nhs_login_token_exchange["access_token"]
@@ -80,4 +89,8 @@ class TestSplunkLogging:
         auth = await self._get_auth_from_splunk_payload(debug)
 
         # Then
-        print(auth)
+
+        assert auth["auth_type"] == "user"
+        assert auth["grant_type"] == "token_exchange"
+        assert auth["level"] == "p9"
+        assert auth["provider"] == "nhs-login"
