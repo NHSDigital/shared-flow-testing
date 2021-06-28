@@ -33,6 +33,8 @@ extends:
     product_display_name: ${{ variables.product_display_name }}
     product_description: ${{ variables.product_description }}
     spec_file: ${{ variables.spec_file }}
+    secret_ids:
+      - ptl/monitoring/status-endpoint-api-key
     apigee_deployments:
       - environment: internal-dev
         make_spec_visible: true  # Off by default. Turn on to allow expose API developers can subscribe their Apps to
