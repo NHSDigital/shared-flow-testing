@@ -60,18 +60,14 @@
         <Step>
           <Name>AssignMessage.AddPayloadToSplunkTest</Name>
         </Step>
+        <Step>
+          <Name>ServiceCallout.LogToSplunk</Name>
+        </Step>
       </Response>
       <Condition>(proxy.pathsuffix MatchesPath "/splunk-test") and ((request.verb = "GET") or (request.verb = "HEAD"))</Condition>
     </Flow>
   </Flows>
   <PreFlow/>
-  <PostClientFlow name="PostClientFlow">
-    <Response>
-      <Step>
-        <Name>ServiceCallout.LogToSplunk</Name>
-      </Step>
-    </Response>
-  </PostClientFlow>
   <HTTPProxyConnection>
     <BasePath>{{ SERVICE_BASE_PATH }}</BasePath>
     <VirtualHost>secure</VirtualHost>

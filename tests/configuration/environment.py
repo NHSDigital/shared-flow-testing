@@ -18,5 +18,6 @@ ENV = {
     "base_path": get_env("SERVICE_BASE_PATH"),
     "jwt_private_key_absolute_path": get_env("JWT_PRIVATE_KEY_ABSOLUTE_PATH"),
     "id_token_nhs_login_private_key_absolute_path": get_env("ID_TOKEN_NHS_LOGIN_PRIVATE_KEY_ABSOLUTE_PATH"),
-    "id_token_private_key_absolute_path": get_env("ID_TOKEN_PRIVATE_KEY_ABSOLUTE_PATH")
+    "id_token_private_key_absolute_path": get_env("ID_TOKEN_PRIVATE_KEY_ABSOLUTE_PATH"),
+    "service_base_path": get_env("SERVICE_BASE_PATH")
 }
