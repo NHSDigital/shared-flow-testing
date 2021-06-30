@@ -9,7 +9,8 @@ steps:
       export SOURCE_COMMIT_ID=$(Build.SourceVersion)
       export APIGEE_ENVIRONMENT="$(ENVIRONMENT)"
       export SERVICE_BASE_PATH="$(SERVICE_BASE_PATH)"
-      export STATUS_ENDPOINT_API_KEY="$(status-endpoint-api-key)"
+     export SERVICE_NAME="$(SERVICE_NAME)"
+     export STATUS_ENDPOINT_API_KEY="$(status-endpoint-api-key)"
       export JWT_PRIVATE_KEY_ABSOLUTE_PATH="$(Pipeline.Workspace)/secrets/$(JWT_TESTING_PRIVATE_KEY)"
       export ID_TOKEN_NHS_LOGIN_PRIVATE_KEY_ABSOLUTE_PATH="$(Pipeline.Workspace)/secrets/$(ID_TOKEN_NHS_LOGIN_PRIVATE_KEY)"
       export ID_TOKEN_PRIVATE_KEY_ABSOLUTE_PATH="$(Pipeline.Workspace)/secrets/$(ID_TOKEN_TESTING_PRIVATE_KEY)"

@@ -3,6 +3,8 @@ import requests
 from api_test_utils.oauth_helper import OauthHelper
 from assertpy import assert_that
 
+from .configuration import config
+
 
 class TestEndpoints:
     @pytest.mark.asyncio
@@ -13,7 +15,7 @@ class TestEndpoints:
 
         # When
         response = requests.get(
-            url="https://internal-dev.api.service.nhs.uk/shared-flow-testing/user-role-service",
+            url=f"https://internal-dev.api.service.nhs.uk/{config.SERVICE_BASE_PATH}/user-role-service",
             headers={
                 "Authorization": f"Bearer {token}",
                 "NHSD-Session-URID": "555254242102",
@@ -31,7 +33,7 @@ class TestEndpoints:
 
         # When
         response = requests.get(
-            url="https://internal-dev.api.service.nhs.uk/shared-flow-testing/user-role-service",
+            url=f"https://internal-dev.api.service.nhs.uk/{config.SERVICE_BASE_PATH}/user-role-service",
             headers={"Authorization": f"Bearer {token}"},
         )
         # Then
@@ -48,7 +50,7 @@ class TestEndpoints:
 
         # When
         response = requests.get(
-            url="https://internal-dev.api.service.nhs.uk/shared-flow-testing/user-role-service",
+            url=f"https://internal-dev.api.service.nhs.uk/{config.SERVICE_BASE_PATH}/user-role-service",
             headers={
                 "Authorization": f"Bearer {token}",
                 "NHSD-Session-URID": "notAuserRole123",
@@ -63,6 +65,7 @@ class TestEndpoints:
         assert_that(expected_error_description).is_equal_to(response.json()["issue"][0]["diagnostics"])
 
     @pytest.mark.asyncio
+    @pytest.mark.debug
     async def test_no_role_provided(self, get_token_client_credentials, debug):
         token = get_token_client_credentials["access_token"]
         # Given
@@ -73,7 +76,7 @@ class TestEndpoints:
 
         # When
         response = requests.get(
-            url="https://internal-dev.api.service.nhs.uk/shared-flow-testing/user-role-service",
+            url=f"https://internal-dev.api.service.nhs.uk/{config.SERVICE_BASE_PATH}/user-role-service",
             headers={"Authorization": f"Bearer {token}"},
         )
         isSharedFlowError = await debug.get_apigee_variable_from_trace(name='sharedFlow.userRoleError')
@@ -96,7 +99,7 @@ class TestEndpoints:
 
         # When
         response = requests.get(
-            url="https://internal-dev.api.service.nhs.uk/shared-flow-testing/user-role-service",
+            url=f"https://internal-dev.api.service.nhs.uk/{config.SERVICE_BASE_PATH}/user-role-service",
             headers={"Authorization": f"Bearer {token}"},
         )
         isSharedFlowError = await debug.get_apigee_variable_from_trace(name='sharedFlow.userRoleError')
@@ -124,7 +127,7 @@ class TestEndpoints:
         )
         # When
         response = requests.get(
-            url="https://internal-dev.api.service.nhs.uk/shared-flow-testing/user-role-service",
+            url=f"https://internal-dev.api.service.nhs.uk/{config.SERVICE_BASE_PATH}/user-role-service",
             headers={
                 "Authorization": f"Bearer {token_resp['body']['access_token']}",
                 "NHSD-Session-URID": "123456789",

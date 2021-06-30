@@ -54,7 +54,7 @@ def debug():
     Import the test utils module to be able to:
         - Use the trace tool and get context variables after making a request to Apigee
     """
-    return ApigeeApiTraceDebug(proxy='shared-flow-testing-pr-19')
+    return ApigeeApiTraceDebug(proxy=config.SERVICE_NAME)
 
 
 @pytest.fixture()
