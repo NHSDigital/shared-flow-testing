@@ -33,33 +33,37 @@ extends:
     product_display_name: ${{ variables.product_display_name }}
     product_description: ${{ variables.product_description }}
     spec_file: ${{ variables.spec_file }}
+    secret_file_ids:
+      - ptl/app-credentials/jwt_testing/non-prod/JWT_TESTING_PRIVATE_KEY
+      - ptl/app-credentials/jwt_testing/non-prod/ID_TOKEN_TESTING_PRIVATE_KEY
+      - ptl/app-credentials/jwt_testing/non-prod/ID_TOKEN_NHS_LOGIN_PRIVATE_KEY
     secret_ids:
       - ptl/monitoring/status-endpoint-api-key
     apigee_deployments:
       - environment: internal-dev
-        make_spec_visible: true  # Off by default. Turn on to allow expose API developers can subscribe their Apps to
+        make_spec_visible: true
         post_deploy:
-          - template: ./templates/run-smoke-tests.yml
-      # - environment: internal-qa
-      #   make_spec_visible: true
-      #   post_deploy:
-      #     - template: ./templates/run-smoke-tests.yml
-      # - environment: internal-qa-sandbox
-      #   proxy_path: sandbox
-      #   make_spec_visible: true
-      #   post_deploy:
-      #     - template: ./templates/run-smoke-tests.yml
-    # make_spec_visible is false for sandbox environment
-    # (App subscription make sense for most sandbox implementations)
-      # - environment: sandbox
-      #   proxy_path: sandbox
-      #   post_deploy:
-      #     - template: ./templates/run-smoke-tests.yml
-    # Enable int environment when ready by uncommenting:
-    #   - environment: int
-    #     make_spec_visible: true
-    #     depends_on:
-    #       - internal_qa
-    #       - internal_qa_sandbox
-    #     post_deploy:
-    #       - template: ./templates/run-smoke-tests.yml
+          - template: ./templates/run-integration-tests.yml
+    # - environment: internal-qa
+    #   make_spec_visible: true
+    #   post_deploy:
+    #     - template: ./templates/run-smoke-tests.yml
+    # - environment: internal-qa-sandbox
+    #   proxy_path: sandbox
+    #   make_spec_visible: true
+    #   post_deploy:
+    #     - template: ./templates/run-smoke-tests.yml
+  # make_spec_visible is false for sandbox environment
+  # (App subscription make sense for most sandbox implementations)
+    # - environment: sandbox
+    #   proxy_path: sandbox
+    #   post_deploy:
+    #     - template: ./templates/run-smoke-tests.yml
+  # Enable int environment when ready by uncommenting:
+  #   - environment: int
+  #     make_spec_visible: true
+  #     depends_on:
+  #       - internal_qa
+  #       - internal_qa_sandbox
+  #     post_deploy:
+  #       - template: ./templates/run-smoke-tests.yml
