@@ -20,7 +20,8 @@ steps:
     export STATUS_ENDPOINT_API_KEY="$(status-endpoint-api-key)"
     export APIGEE_API_TOKEN="$(secret.AccessToken)"
     export OAUTH_PROXY="oauth2"
-    ./test_env/bin/pytest --reruns 5 --reruns-delay 1 -v --junitxml=test-report.xml
+    export OAUTH_BASE_URI="https://$(APIGEE_ENVIRONMENT).api.service.nhs.uk"
+    ./test_env/bin/pytest --reruns 2 --reruns-delay 1 -v --junitxml=test-report.xml
    workingDirectory: $(Pipeline.Workspace)/s/$(SERVICE_NAME)/$(SERVICE_ARTIFACT_NAME)/tests
    displayName: run smoketests
 
