@@ -8,14 +8,14 @@
             "type" : "object",
             "properties" :
             {
-                "ip" : {"type" : "string"},
-                "received_start" : {"type" : "string"},
-                "received_end" : {"type" : "string"},
-                "sent_start": {"type" : "string"},
-                "sent_end": {"type" : "string"},
+                "ip" : {"type" : "string", "pattern" : "^(?:(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\\.){3}(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)$"},
+                "received_start" : {"type" : "string", "pattern" : "^\\d+$"},
+                "received_end" : {"type" : "string", "pattern" : "^\\d+$"},
+                "sent_start": {"type" : "string", "pattern" : "^(-1)$|^\\d+$"},
+                "sent_end": {"type" : "string", "pattern" : "^(-1)$|^\\d+$"},
                 "user_agent": {"type" : "string"}
             },
-            "required" : ["ip"]
+            "required" : ["ip", "received_start", "received_end", "sent_start", "sent_end", "user_agent"]
         },
         "request": 
         {
@@ -23,33 +23,35 @@
             "properties" :
             {
                 "uri": {"type" : "string"},
-                "verb": {"type" : "string"},
+                "verb": {"type" : "string", "pattern" : "GET|POST|PUT|PATCH"},
                 "content_type": {"type" : "string"},
                 "content_length": {"type" : "string"},
                 "content_encoding": {"type" : "string"},
                 "requestID": {"type" : "string"},
                 "correlationID": {"type" : "string"},
                 "host": {"type" : "string"},
-                "port": {"type" : "string"},
+                "port": {"type" : "string", "pattern" : "^((6553[0-5])|(655[0-2][0-9])|(65[0-4][0-9]{2})|(6[0-4][0-9]{3})|([1-5][0-9]{4})|([0-5]{0,5})|([0-9]{1,4}))$"},
                 "uri_path": {"type" : "string"},
                 "uri_params": {"type" : "string"}
-            }
+            },
+            "required" : ["uri", "verb","content_type","content_length","content_encoding","requestID","correlationID","host","port","uri_path","uri_params"]
         },
         "meta": 
         {
             "type" : "object",
             "properties" : 
             {
-                "organization": {"type" : "string"},
-                "api_guid": {"type" : "string"},
-                "api_spec_guid": {"type" : "string"},
+                "organization": {"type" : "string", "pattern" : "nhsd-nonprod|nhsd-prod"},
+                "api_guid": {"type" : "string", "pattern" : "^[0-9a-fA-F]{8}\\b-[0-9a-fA-F]{4}\\b-[0-9a-fA-F]{4}\\b-[0-9a-fA-F]{4}\\b-[0-9a-fA-F]{12}$"},
+                "api_spec_guid": {"type" : "string", "pattern" : "^[0-9a-fA-F]{8}\\b-[0-9a-fA-F]{4}\\b-[0-9a-fA-F]{4}\\b-[0-9a-fA-F]{4}\\b-[0-9a-fA-F]{12}$"},
                 "product": {"type" : "string"},
                 "application": {"type" : "string"},
                 "env": {"type" : "string"},
-                "client_id": {"type" : "string"},
-                "application_id": {"type" : "string"},
-                "ASID": {"type" : "string"}
-            }
+                "client_id": {"type" : "string", "pattern" : "^[0-9A-Za-z]{32}$"},
+                "application_id": {"type" : "string", "pattern" : "^[0-9a-fA-F]{8}\\b-[0-9a-fA-F]{4}\\b-[0-9a-fA-F]{4}\\b-[0-9a-fA-F]{4}\\b-[0-9a-fA-F]{12}$"},
+                "ASID": {"type" : "string", "pattern" : "^[0-9]{12}$"}
+            },
+            "required" : ["organization", "api_guid", "api_spec_guid", "product", "application", "env", "client_id", "application_id", "ASID"]
         },
         "proxy": 
         {
@@ -60,8 +62,8 @@
                 "revision": {"type" : "string"},
                 "basepath": {"type" : "string"},
                 "suffix": {"type" : "string"}
-            }
-            
+            }, 
+            "required" : ["name", "revision", "basepath", "suffix"]
         },
         "auth": 
         {
@@ -77,18 +79,20 @@
                         "grant_type": {"type" : "string"},
                         "level": {"type" : "string"},
                         "provider": {"type" : "string"}
-                    }
-                }
+                    },
+                    "required" : ["auth_type", "grant_type", "level", "provider"]
+                },
+                "id_token_acr": {"type" : "string"},
+                "grant_type": {"type" : "string"},
+                "authorization": {"type" : "string"},
+                "id_token_subject": {"type" : "string"},
+                "id_token_issuer": {"type" : "string"},
+                "scope": {"type" : "string"}
             },
-            "id_token_acr": {"type" : "string"},
-            "grant_type": {"type" : "string"},
-            "authorization": {"type" : "string"},
-            "id_token_subject": {"type" : "string"},
-            "id_token_issuer": {"type" : "string"},
-            "scope": {"type" : "string"}
-          },
-          "target": 
-          {
+            "required" : ["meta", "id_token_acr", "grant_type", "authorization", "id_token_subject", "id_token_issuer", "scope"]
+        },
+        "target": 
+        {
               "type" : "object",
               "properties" : 
               {
@@ -100,10 +104,11 @@
                 "sent_start": {"type" : "string"},
                 "sent_end": {"type" : "string"},
                 "port": {"type" : "string"}
-              }
-          },
-          "error": 
-          {
+              },
+              "required" : ["host", "status_code", "content_length", "received_start", "received_end", "sent_start", "sent_end", "port"]
+        },
+        "error": 
+        {
               "type" : "object",
               "properties" : 
               {
@@ -119,10 +124,11 @@
                 "reason_phrase": {"type" : "string"},
                 "transport_message": {"type" : "string"},
                 "state": {"type" : "string"}
-              }
+              },
+              "required" : ["is_error", "is_policy_error", "is_target_error", "policy_error_policy_name", "policy_error_flow_name", "error", "content", "message", "status_code", "reason_phrase", "transport_message", "state"]
            
-          },
-          "response": {
+        },
+        "response": {
               "type" : "object",
               "properties" : 
               {
@@ -131,10 +137,12 @@
                 "content_length": {"type" : "string"},
                 "content_encoding": {"type" : "string"},
                 "content_body": {"type" : "string"}
-              }
+              },
+              "required" : ["status_code", "content_type", "content_length", "content_encoding", "content_body"]
             
-          }
-    }
+        }
+    },
+    "required" : ["messageID" , "client", "request", "meta", "proxy", "auth", "target", "error", "response"]
     
  }
 
