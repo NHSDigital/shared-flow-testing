@@ -1,0 +1,140 @@
+{
+    "type": "object",
+    "properties" : 
+    {
+        "messageID" : {"type" : "string"},
+        "client" : 
+        {
+            "type" : "object",
+            "properties" :
+            {
+                "ip" : {"type" : "string"},
+                "received_start" : {"type" : "string"},
+                "received_end" : {"type" : "string"},
+                "sent_start": {"type" : "string"},
+                "sent_end": {"type" : "string"},
+                "user_agent": {"type" : "string"}
+            },
+            "required" : ["ip"]
+        },
+        "request": 
+        {
+            "type" : "object",
+            "properties" :
+            {
+                "uri": {"type" : "string"},
+                "verb": {"type" : "string"},
+                "content_type": {"type" : "string"},
+                "content_length": {"type" : "string"},
+                "content_encoding": {"type" : "string"},
+                "requestID": {"type" : "string"},
+                "correlationID": {"type" : "string"},
+                "host": {"type" : "string"},
+                "port": {"type" : "string"},
+                "uri_path": {"type" : "string"},
+                "uri_params": {"type" : "string"}
+            }
+        },
+        "meta": 
+        {
+            "type" : "object",
+            "properties" : 
+            {
+                "organization": {"type" : "string"},
+                "api_guid": {"type" : "string"},
+                "api_spec_guid": {"type" : "string"},
+                "product": {"type" : "string"},
+                "application": {"type" : "string"},
+                "env": {"type" : "string"},
+                "client_id": {"type" : "string"},
+                "application_id": {"type" : "string"},
+                "ASID": {"type" : "string"}
+            }
+        },
+        "proxy": 
+        {
+            "type" : "object",
+            "properties" :
+            {
+                "name": {"type" : "string"},
+                "revision": {"type" : "string"},
+                "basepath": {"type" : "string"},
+                "suffix": {"type" : "string"}
+            }
+            
+        },
+        "auth": 
+        {
+            "type" : "object",
+            "properties" : 
+            {
+                "meta" : 
+                {
+                    "type" : "object",
+                    "properties" :
+                    {
+                        "auth_type": {"type" : "string"},
+                        "grant_type": {"type" : "string"},
+                        "level": {"type" : "string"},
+                        "provider": {"type" : "string"}
+                    }
+                }
+            },
+            "id_token_acr": {"type" : "string"},
+            "grant_type": {"type" : "string"},
+            "authorization": {"type" : "string"},
+            "id_token_subject": {"type" : "string"},
+            "id_token_issuer": {"type" : "string"},
+            "scope": {"type" : "string"}
+          },
+          "target": 
+          {
+              "type" : "object",
+              "properties" : 
+              {
+                "host": {"type" : "string"},
+                "status_code": {"type" : "string"},
+                "content_length": {"type" : "string"},
+                "received_start": {"type" : "string"},
+                "received_end": {"type" : "string"},
+                "sent_start": {"type" : "string"},
+                "sent_end": {"type" : "string"},
+                "port": {"type" : "string"}
+              }
+          },
+          "error": 
+          {
+              "type" : "object",
+              "properties" : 
+              {
+                "is_error": {"type" : "string"},
+                "is_policy_error": {"type" : "string"},
+                "is_target_error": {"type" : "string"},
+                "policy_error_policy_name": {"type" : "string"},
+                "policy_error_flow_name": {"type" : "string"},
+                "error": {"type" : "string"},
+                "content": {"type" : "string"},
+                "message": {"type" : "string"},
+                "status_code": {"type" : "string"},
+                "reason_phrase": {"type" : "string"},
+                "transport_message": {"type" : "string"},
+                "state": {"type" : "string"}
+              }
+           
+          },
+          "response": {
+              "type" : "object",
+              "properties" : 
+              {
+                "status_code": {"type" : "string"},
+                "content_type": {"type" : "string"},
+                "content_length": {"type" : "string"},
+                "content_encoding": {"type" : "string"},
+                "content_body": {"type" : "string"}
+              }
+            
+          }
+    }
+    
+ }
+
