@@ -44,8 +44,10 @@ extends:
     apigee_deployments:
       - environment: internal-dev
         make_spec_visible: true
-        post_deploy:
-          - template: ./templates/run-integration-tests.yml
+        # Enable integration tests when you open a pr. Run tests and once you're happy comment out tests.
+        # Merge your branch to master and then apply shared-flow changes in the infrastructure repo.
+#        post_deploy:
+#          - template: ./templates/run-integration-tests.yml
     # - environment: internal-dev-sandbox
     #   proxy_path: sandbox
     #   post_deploy:
