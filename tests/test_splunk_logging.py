@@ -112,7 +112,7 @@ class TestSplunkLogging:
             headers={"Authorization": f"Bearer {token}"},
         )
         payload = await self._get_payload_from_splunk(debug)
-        
+
         with open('splunk_logging_schema.json') as f:
             schema = json.load(f)
 
