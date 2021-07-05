@@ -49,7 +49,7 @@
                 "env": {"type" : "string"},
                 "client_id": {"type" : "string", "pattern" : "^[0-9A-Za-z]{32}$"},
                 "application_id": {"type" : "string", "pattern" : "^[0-9a-fA-F]{8}\\b-[0-9a-fA-F]{4}\\b-[0-9a-fA-F]{4}\\b-[0-9a-fA-F]{4}\\b-[0-9a-fA-F]{12}$"},
-                "ASID": {"type" : "string", "pattern" : "^[0-9]{12}$"}
+                "ASID": {"type" : "string"}
             },
             "required" : ["organization", "api_guid", "api_spec_guid", "product", "application", "env", "client_id", "application_id", "ASID"]
         },
