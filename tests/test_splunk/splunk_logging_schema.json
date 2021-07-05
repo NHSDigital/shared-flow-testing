@@ -25,7 +25,7 @@
                 "uri": {"type" : "string"},
                 "verb": {"type" : "string", "pattern" : "GET|POST|PUT|PATCH"},
                 "content_type": {"type" : "string"},
-                "content_length": {"type" : "string"},
+                "content_length": {"type" : "string", "pattern" : "^\\d+$"},
                 "content_encoding": {"type" : "string"},
                 "requestID": {"type" : "string"},
                 "correlationID": {"type" : "string"},
@@ -57,7 +57,7 @@
         {
             "type" : "object",
             "properties" :
-            
+
             {
                 "name": {"type" : "string"},
                 "revision": {"type" : "string"},
@@ -133,7 +133,7 @@
               "type" : "object",
               "properties" : 
               {
-                "status_code": {"type" : "string"},
+                "status_code": {"type" : "string", "pattern" : "^[1-5][0-9][0-9]$"},
                 "content_type": {"type" : "string"},
                 "content_length": {"type" : "string"},
                 "content_encoding": {"type" : "string"},

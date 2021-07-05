@@ -1,7 +1,7 @@
 from jsonschema import validate
 import json
 
-class TestSplunkLoging:
+class TestSplunkLogging:
     def test_firstTest(self):
 
 
