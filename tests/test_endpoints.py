@@ -57,7 +57,6 @@ class TestEndpoints:
             },
         )
         isSharedFlowError = await debug.get_apigee_variable_from_trace(name='sharedFlow.userRoleError')
-
         # Then
         assert_that(isSharedFlowError).is_equal_to('true')
         assert_that(expected_status_code).is_equal_to(response.status_code)
