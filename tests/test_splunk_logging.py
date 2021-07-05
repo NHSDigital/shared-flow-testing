@@ -118,4 +118,3 @@ class TestSplunkLogging:
 
         # If no exception is raised by validate(), the instance is valid.
         validate(instance=payload, schema=schema)
-        
