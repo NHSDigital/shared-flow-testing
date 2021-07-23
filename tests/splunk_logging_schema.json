@@ -88,9 +88,10 @@
                 "authorization": {"type" : "string"},
                 "id_token_subject": {"type" : "string"},
                 "id_token_issuer": {"type" : "string"},
-                "scope": {"type" : "string"}
+                "scope": {"type" : "string"},
+                "access_token_hash": {"type" : "string"}
             },
-            "required" : ["meta", "id_token_acr", "grant_type", "authorization", "id_token_subject", "id_token_issuer", "scope"]
+            "required" : ["meta", "id_token_acr", "grant_type", "authorization", "id_token_subject", "id_token_issuer", "scope", "access_token_hash"]
         },
         "target": 
         {
