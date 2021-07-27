@@ -41,19 +41,16 @@ class TestSplunkLogging:
             headers={"Authorization": f"Bearer {token}"},
         )
         payload = await self._get_payload_from_splunk(debug)
-        auth = payload["auth"]
-        auth_meta = auth["meta"]
 
         # Then
+        auth = payload["auth"]
+        assert auth["access_token_hash"] == expected_hashed_token
+
+        auth_meta = auth["meta"]
         assert auth_meta["auth_type"] == "app"
         assert auth_meta["grant_type"] == "client_credentials"
         assert auth_meta["level"] == "level3"
         assert auth_meta["provider"] == "apim"
-
-        # After deploying infra changes remove these assertion and uncomment last assertion
-        act_hashed = await debug.get_apigee_variable_from_trace(name='auth.access_token_hash')
-        assert act_hashed == expected_hashed_token
-        # assert auth["access_token_hash"] == expected_hashed_token
 
     @pytest.mark.splunk
     @pytest.mark.asyncio
@@ -69,19 +66,16 @@ class TestSplunkLogging:
             headers={"Authorization": f"Bearer {token}"},
         )
         payload = await self._get_payload_from_splunk(debug)
-        auth = payload["auth"]
-        auth_meta = auth["meta"]
 
         # Then
+        auth = payload["auth"]
+        assert auth["access_token_hash"] == expected_hashed_token
+
+        auth_meta = auth["meta"]
         assert auth_meta["auth_type"] == "user"
         assert auth_meta["grant_type"] == "authorization_code"
         assert auth_meta["level"] == "aal3"
         assert auth_meta["provider"] == "nhs-cis2"
-
-        # After deploying infra changes remove these assertion and uncomment last assertion
-        act_hashed = await debug.get_apigee_variable_from_trace(name='auth.access_token_hash')
-        assert act_hashed == expected_hashed_token
-        # assert auth["access_token_hash"] == expected_hashed_token
 
     @pytest.mark.splunk
     @pytest.mark.asyncio
@@ -97,19 +91,16 @@ class TestSplunkLogging:
             headers={"Authorization": f"Bearer {token}"},
         )
         payload = await self._get_payload_from_splunk(debug)
-        auth = payload["auth"]
-        auth_meta = auth["meta"]
 
         # Then
+        auth = payload["auth"]
+        assert auth["access_token_hash"] == expected_hashed_token
+
+        auth_meta = auth["meta"]
         assert auth_meta["auth_type"] == "user"
         assert auth_meta["grant_type"] == "token_exchange"
         assert auth_meta["level"] == "aal3"
         assert auth_meta["provider"] == "nhs-cis2"
-
-        # After deploying infra changes remove these assertion and uncomment last assertion
-        act_hashed = await debug.get_apigee_variable_from_trace(name='auth.access_token_hash')
-        assert act_hashed == expected_hashed_token
-        # assert auth["access_token_hash"] == expected_hashed_token
 
     @pytest.mark.splunk
     @pytest.mark.asyncio
@@ -125,20 +116,16 @@ class TestSplunkLogging:
             headers={"Authorization": f"Bearer {token}"},
         )
         payload = await self._get_payload_from_splunk(debug)
-        auth = payload["auth"]
-        auth_meta = auth["meta"]
 
         # Then
+        auth = payload["auth"]
+        assert auth["access_token_hash"] == expected_hashed_token
 
+        auth_meta = auth["meta"]
         assert auth_meta["auth_type"] == "user"
         assert auth_meta["grant_type"] == "token_exchange"
         assert auth_meta["level"] == "p9"
         assert auth_meta["provider"] == "nhs-login"
-
-        # After deploying infra changes remove these assertion and uncomment last assertion
-        act_hashed = await debug.get_apigee_variable_from_trace(name='auth.access_token_hash')
-        assert act_hashed == expected_hashed_token
-        # assert auth["access_token_hash"] == expected_hashed_token
 
     @pytest.mark.splunk
     @pytest.mark.asyncio
@@ -163,7 +150,7 @@ class TestSplunkLogging:
     @pytest.mark.splunk
     @pytest.mark.asyncio
     @pytest.mark.debug
-    async def test_splunk_payload_schema_open_access(self, get_token, debug):
+    async def test_splunk_payload_schema_open_access(self, debug):
         # When hitting an open-access endpoint
         await debug.start_trace()
         requests.get(url=self.open_access_url)
