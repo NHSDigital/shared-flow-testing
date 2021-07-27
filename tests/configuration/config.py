@@ -1,4 +1,5 @@
 from .environment import ENV
+from os import environ
 
 # Api Details
 ENVIRONMENT = ENV["environment"]
@@ -11,3 +12,4 @@ ID_TOKEN_NHS_LOGIN_PRIVATE_KEY_ABSOLUTE_PATH = ENV["id_token_nhs_login_private_k
 ID_TOKEN_PRIVATE_KEY_ABSOLUTE_PATH = ENV["id_token_private_key_absolute_path"]
 SERVICE_BASE_PATH = ENV['service_base_path']
 SERVICE_NAME = ENV['service_name']
+ACCESS_TOKEN_HASH_SECRET = environ.get("ACCESS_TOKEN_HASH_SECRET")

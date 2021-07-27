@@ -1,23 +1,38 @@
+import base64
+import hashlib
+import hmac
 import json
+
 import pytest
 import requests
-
-from .configuration.config import SERVICE_BASE_PATH, ENVIRONMENT
 from jsonschema import validate
+
+from .configuration.config import SERVICE_BASE_PATH, ENVIRONMENT, ACCESS_TOKEN_HASH_SECRET
 
 
 class TestSplunkLogging:
     url = f"https://{ENVIRONMENT}.api.service.nhs.uk/{SERVICE_BASE_PATH}/splunk-test"
+    open_access_url = f"https://{ENVIRONMENT}.api.service.nhs.uk/{SERVICE_BASE_PATH}/open-access"
 
-    async def _get_payload_from_splunk(self, debug):
+    @staticmethod
+    async def _get_payload_from_splunk(debug):
         splunk_content_json = await debug.get_apigee_variable_from_trace(name='splunkCalloutRequest.content')
         return json.loads(splunk_content_json)
+
+    @staticmethod
+    def _calculate_hmac_sha512(content: str) -> str:
+        binary_content = bytes(content, "utf-8")
+        hmac_key = bytes(ACCESS_TOKEN_HASH_SECRET, "utf-8")
+        signature = hmac.new(hmac_key, binary_content, hashlib.sha512)
+
+        return base64.b64encode(signature.digest()).decode("utf-8")
 
     @pytest.mark.splunk
     @pytest.mark.asyncio
     async def test_splunk_auth_with_client_credentials(self, get_token_client_credentials, debug):
         # Given
         token = get_token_client_credentials["access_token"]
+        expected_hashed_token = self._calculate_hmac_sha512(token)
 
         # When
         await debug.start_trace()
@@ -26,19 +41,26 @@ class TestSplunkLogging:
             headers={"Authorization": f"Bearer {token}"},
         )
         payload = await self._get_payload_from_splunk(debug)
-        auth = payload["auth"]["meta"]
+        auth = payload["auth"]
+        auth_meta = auth["meta"]
 
         # Then
-        assert auth["auth_type"] == "app"
-        assert auth["grant_type"] == "client_credentials"
-        assert auth["level"] == "level3"
-        assert auth["provider"] == "apim"
+        assert auth_meta["auth_type"] == "app"
+        assert auth_meta["grant_type"] == "client_credentials"
+        assert auth_meta["level"] == "level3"
+        assert auth_meta["provider"] == "apim"
+
+        # After deploying infra changes remove these assertion and uncomment last assertion
+        act_hashed = await debug.get_apigee_variable_from_trace(name='auth.access_token_hash')
+        assert act_hashed == expected_hashed_token
+        # assert auth["access_token_hash"] == expected_hashed_token
 
     @pytest.mark.splunk
     @pytest.mark.asyncio
     async def test_splunk_auth_with_authorization_code(self, get_token, debug):
         # Given
         token = get_token["access_token"]
+        expected_hashed_token = self._calculate_hmac_sha512(token)
 
         # When
         await debug.start_trace()
@@ -47,19 +69,26 @@ class TestSplunkLogging:
             headers={"Authorization": f"Bearer {token}"},
         )
         payload = await self._get_payload_from_splunk(debug)
-        auth = payload["auth"]["meta"]
+        auth = payload["auth"]
+        auth_meta = auth["meta"]
 
         # Then
-        assert auth["auth_type"] == "user"
-        assert auth["grant_type"] == "authorization_code"
-        assert auth["level"] == "aal3"
-        assert auth["provider"] == "nhs-cis2"
+        assert auth_meta["auth_type"] == "user"
+        assert auth_meta["grant_type"] == "authorization_code"
+        assert auth_meta["level"] == "aal3"
+        assert auth_meta["provider"] == "nhs-cis2"
+
+        # After deploying infra changes remove these assertion and uncomment last assertion
+        act_hashed = await debug.get_apigee_variable_from_trace(name='auth.access_token_hash')
+        assert act_hashed == expected_hashed_token
+        # assert auth["access_token_hash"] == expected_hashed_token
 
     @pytest.mark.splunk
     @pytest.mark.asyncio
     async def test_splunk_auth_with_cis2_token_exchange(self, get_token_cis2_token_exchange, debug):
         # Given
         token = get_token_cis2_token_exchange["access_token"]
+        expected_hashed_token = self._calculate_hmac_sha512(token)
 
         # When
         await debug.start_trace()
@@ -68,19 +97,26 @@ class TestSplunkLogging:
             headers={"Authorization": f"Bearer {token}"},
         )
         payload = await self._get_payload_from_splunk(debug)
-        auth = payload["auth"]["meta"]
+        auth = payload["auth"]
+        auth_meta = auth["meta"]
 
         # Then
-        assert auth["auth_type"] == "user"
-        assert auth["grant_type"] == "token_exchange"
-        assert auth["level"] == "aal3"
-        assert auth["provider"] == "nhs-cis2"
+        assert auth_meta["auth_type"] == "user"
+        assert auth_meta["grant_type"] == "token_exchange"
+        assert auth_meta["level"] == "aal3"
+        assert auth_meta["provider"] == "nhs-cis2"
+
+        # After deploying infra changes remove these assertion and uncomment last assertion
+        act_hashed = await debug.get_apigee_variable_from_trace(name='auth.access_token_hash')
+        assert act_hashed == expected_hashed_token
+        # assert auth["access_token_hash"] == expected_hashed_token
 
     @pytest.mark.splunk
     @pytest.mark.asyncio
     async def test_splunk_auth_with_nhs_login_token_exchange(self, get_token_nhs_login_token_exchange, debug):
         # Given
         token = get_token_nhs_login_token_exchange["access_token"]
+        expected_hashed_token = self._calculate_hmac_sha512(token)
 
         # When
         await debug.start_trace()
@@ -89,19 +125,24 @@ class TestSplunkLogging:
             headers={"Authorization": f"Bearer {token}"},
         )
         payload = await self._get_payload_from_splunk(debug)
-        auth = payload["auth"]["meta"]
+        auth = payload["auth"]
+        auth_meta = auth["meta"]
 
         # Then
 
-        assert auth["auth_type"] == "user"
-        assert auth["grant_type"] == "token_exchange"
-        assert auth["level"] == "p9"
-        assert auth["provider"] == "nhs-login"
+        assert auth_meta["auth_type"] == "user"
+        assert auth_meta["grant_type"] == "token_exchange"
+        assert auth_meta["level"] == "p9"
+        assert auth_meta["provider"] == "nhs-login"
+
+        # After deploying infra changes remove these assertion and uncomment last assertion
+        act_hashed = await debug.get_apigee_variable_from_trace(name='auth.access_token_hash')
+        assert act_hashed == expected_hashed_token
+        # assert auth["access_token_hash"] == expected_hashed_token
 
     @pytest.mark.splunk
     @pytest.mark.asyncio
-    async def test_splunk_payload(self, get_token, debug):
-
+    async def test_splunk_payload_schema(self, get_token, debug):
         # Given
         token = get_token["access_token"]
 
@@ -116,5 +157,21 @@ class TestSplunkLogging:
         with open('splunk_logging_schema.json') as f:
             schema = json.load(f)
 
+        # If no exception is raised by validate(), the instance is valid.
+        validate(instance=payload, schema=schema)
+
+    @pytest.mark.splunk
+    @pytest.mark.asyncio
+    @pytest.mark.debug
+    async def test_splunk_payload_schema_open_access(self, get_token, debug):
+        # When hitting an open-access endpoint
+        await debug.start_trace()
+        requests.get(url=self.open_access_url)
+        payload = await self._get_payload_from_splunk(debug)
+
+        with open('splunk_logging_schema.json') as f:
+            schema = json.load(f)
+
+        # Then
         # If no exception is raised by validate(), the instance is valid.
         validate(instance=payload, schema=schema)
