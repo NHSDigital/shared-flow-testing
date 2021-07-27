@@ -149,7 +149,6 @@ class TestSplunkLogging:
 
     @pytest.mark.splunk
     @pytest.mark.asyncio
-    @pytest.mark.debug
     async def test_splunk_payload_schema_open_access(self, debug):
         # When hitting an open-access endpoint
         await debug.start_trace()
