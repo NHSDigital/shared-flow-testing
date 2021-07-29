@@ -64,7 +64,6 @@ class TestEndpoints:
         assert_that(expected_error_description).is_equal_to(response.json()["issue"][0]["diagnostics"])
 
     @pytest.mark.asyncio
-    @pytest.mark.debug
     async def test_no_role_provided(self, get_token_client_credentials, debug):
         token = get_token_client_credentials["access_token"]
         # Given

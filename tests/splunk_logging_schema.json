@@ -1,9 +1,9 @@
 {
     "type": "object",
-    "properties" : 
+    "properties" :
     {
         "messageID" : {"type" : "string"},
-        "client" : 
+        "client" :
         {
             "type" : "object",
             "properties" :
@@ -17,7 +17,7 @@
             },
             "required" : ["ip", "received_start", "received_end", "sent_start", "sent_end", "user_agent"]
         },
-        "request": 
+        "request":
         {
             "type" : "object",
             "properties" :
@@ -36,10 +36,10 @@
             },
             "required" : ["uri", "verb","content_type","content_length","content_encoding","requestID","correlationID","host","port","uri_path","uri_params"]
         },
-        "meta": 
+        "meta":
         {
             "type" : "object",
-            "properties" : 
+            "properties" :
             {
                 "organization": {"type" : "string", "pattern" : "nhsd-nonprod|nhsd-prod"},
                 "api_guid": {"type" : "string", "pattern" : "^[0-9a-fA-F]{8}\\b-[0-9a-fA-F]{4}\\b-[0-9a-fA-F]{4}\\b-[0-9a-fA-F]{4}\\b-[0-9a-fA-F]{12}$"},
@@ -47,13 +47,13 @@
                 "product": {"type" : "string"},
                 "application": {"type" : "string"},
                 "env": {"type" : "string"},
-                "client_id": {"type" : "string", "pattern" : "^[0-9A-Za-z]{32}$"},
-                "application_id": {"type" : "string", "pattern" : "^[0-9a-fA-F]{8}\\b-[0-9a-fA-F]{4}\\b-[0-9a-fA-F]{4}\\b-[0-9a-fA-F]{4}\\b-[0-9a-fA-F]{12}$"},
+                "client_id": {"type" : "string", "pattern" : "(^[0-9A-Za-z]{32}$)|^$"},
+                "application_id": {"type" : "string", "pattern" : "(^[0-9a-fA-F]{8}\\b-[0-9a-fA-F]{4}\\b-[0-9a-fA-F]{4}\\b-[0-9a-fA-F]{4}\\b-[0-9a-fA-F]{12}$)|^$"},
                 "ASID": {"type" : "string"}
             },
             "required" : ["organization", "api_guid", "api_spec_guid", "product", "application", "env", "client_id", "application_id", "ASID"]
         },
-        "proxy": 
+        "proxy":
         {
             "type" : "object",
             "properties" :
@@ -63,15 +63,15 @@
                 "revision": {"type" : "string"},
                 "basepath": {"type" : "string"},
                 "suffix": {"type" : "string"}
-            }, 
+            },
             "required" : ["name", "revision", "basepath", "suffix"]
         },
-        "auth": 
+        "auth":
         {
             "type" : "object",
-            "properties" : 
+            "properties" :
             {
-                "meta" : 
+                "meta" :
                 {
                     "type" : "object",
                     "properties" :
@@ -88,14 +88,15 @@
                 "authorization": {"type" : "string"},
                 "id_token_subject": {"type" : "string"},
                 "id_token_issuer": {"type" : "string"},
-                "scope": {"type" : "string"}
+                "scope": {"type" : "string"},
+                "access_token_hash": {"type" : "string"}
             },
-            "required" : ["meta", "id_token_acr", "grant_type", "authorization", "id_token_subject", "id_token_issuer", "scope"]
+            "required" : ["meta", "id_token_acr", "grant_type", "authorization", "id_token_subject", "id_token_issuer", "scope", "access_token_hash"]
         },
-        "target": 
+        "target":
         {
               "type" : "object",
-              "properties" : 
+              "properties" :
               {
                 "host": {"type" : "string"},
                 "status_code": {"type" : "string"},
@@ -108,10 +109,10 @@
               },
               "required" : ["host", "status_code", "content_length", "received_start", "received_end", "sent_start", "sent_end", "port"]
         },
-        "error": 
+        "error":
         {
               "type" : "object",
-              "properties" : 
+              "properties" :
               {
                 "is_error": {"type" : "string"},
                 "is_policy_error": {"type" : "string"},
@@ -127,11 +128,11 @@
                 "state": {"type" : "string"}
               },
               "required" : ["is_error", "is_policy_error", "is_target_error", "policy_error_policy_name", "policy_error_flow_name", "error", "content", "message", "status_code", "reason_phrase", "transport_message", "state"]
-           
+
         },
         "response": {
               "type" : "object",
-              "properties" : 
+              "properties" :
               {
                 "status_code": {"type" : "string", "pattern" : "^[1-5][0-9][0-9]$"},
                 "content_type": {"type" : "string"},
@@ -140,10 +141,10 @@
                 "content_body": {"type" : "string"}
               },
               "required" : ["status_code", "content_type", "content_length", "content_encoding", "content_body"]
-            
+
         }
     },
     "required" : ["messageID" , "client", "request", "meta", "proxy", "auth", "target", "error", "response"]
-    
+
  }
 
