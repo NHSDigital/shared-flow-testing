@@ -70,20 +70,6 @@
       </Flow>
   </Flows>
   <PreFlow/>
-  <PostFlow>
-    <Response>
-      <Step>
-        <Name>AssignMessage.SetUserIdToIdTokenSubject</Name>
-        <Condition>accesstoken.auth_provider != "nhs-login"</Condition>
-      </Step>
-      <Step>
-        <Name>AssignMessage.SetUserIdToNhsNumber</Name>
-        <Condition>accesstoken.auth_provider == "nhs-login"</Condition>
-      </Step>
-
-    </Response>
-
-  </PostFlow>
   <PostClientFlow name="PostClientFlow">
     <Response>
       <Step>
