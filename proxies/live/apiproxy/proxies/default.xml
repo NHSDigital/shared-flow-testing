@@ -73,10 +73,15 @@
   <PostClientFlow name="PostClientFlow">
     <Response>
       <Step>
-        <Name>FlowCallout.SetUserId</Name>
+        <Name>AssignMessage.SetUserIdToIdTokenSubject</Name>
+        <Condition>accesstoken.auth_provider != "nhs-login"</Condition>
       </Step>
       <Step>
-        <Name>FlowCallout.LogToSplunk</Name>
+        <Name>AssignMessage.SetUserIdToNhsNumber</Name>
+        <Condition>accesstoken.auth_provider == "nhs-login"</Condition>
+      </Step>
+      <Step>
+        <Name>ServiceCallout.LogToSplunk</Name>
       </Step>
     </Response>
   </PostClientFlow>

@@ -79,6 +79,7 @@ class TestSplunkLogging:
 
     @pytest.mark.splunk
     @pytest.mark.asyncio
+    @pytest.mark.debug
     async def test_splunk_auth_with_cis2_token_exchange(self, get_token_cis2_token_exchange, debug):
         # Given
         token = get_token_cis2_token_exchange["access_token"]
