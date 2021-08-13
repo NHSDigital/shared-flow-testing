@@ -70,11 +70,25 @@
       </Flow>
   </Flows>
   <PreFlow/>
-  <PostClientFlow name="PostClientFlow">
+  <PostFlow>
     <Response>
+      <Step>
+        <Name>AssignMessage.SetUserIdToIdTokenSubject</Name>
+        <Condition>accesstoken.auth_provider != "nhs-login"</Condition>
+      </Step>
+      <Step>
+        <Name>AssignMessage.SetUserIdToNhsNumber</Name>
+        <Condition>accesstoken.auth_provider == "nhs-login"</Condition>
+      </Step>
       <Step>
         <Name>ServiceCallout.LogToSplunk</Name>
       </Step>
+
+    </Response>
+
+  </PostFlow>
+  <PostClientFlow name="PostClientFlow">
+    <Response>
     </Response>
   </PostClientFlow>
   <HTTPProxyConnection>
