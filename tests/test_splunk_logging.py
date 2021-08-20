@@ -53,7 +53,7 @@ class TestSplunkLogging:
         assert auth_meta["provider"] == "apim"
 
         auth_user = auth["user"]
-        assert auth_user["user_id"] == "foo"
+        assert auth_user["user_id"] == ""
 
     @pytest.mark.splunk
     @pytest.mark.asyncio
@@ -81,7 +81,7 @@ class TestSplunkLogging:
         assert auth_meta["provider"] == "nhs-cis2"
 
         auth_user = auth["user"]
-        assert auth_user["user_id"] == "foo"
+        assert auth_user["user_id"] == "787807429511"
 
     @pytest.mark.splunk
     @pytest.mark.asyncio
@@ -109,7 +109,7 @@ class TestSplunkLogging:
         assert auth_meta["provider"] == "nhs-cis2"
 
         auth_user = auth["user"]
-        assert auth_user["user_id"] == "foo"
+        assert auth_user["user_id"] == "lala"
 
     @pytest.mark.splunk
     @pytest.mark.asyncio
@@ -134,10 +134,10 @@ class TestSplunkLogging:
         assert auth_meta["auth_type"] == "user"
         assert auth_meta["grant_type"] == "token_exchange"
         assert auth_meta["level"] == "p9"
-        assert auth_meta["provider"] == "nhs-login"
+        assert auth_meta["provider"] == "apim-mock-nhs-login"
 
         auth_user = auth["user"]
-        assert auth_user["user_id"] == "foo"
+        assert auth_user["user_id"] == "900000000001"
 
     @pytest.mark.splunk
     @pytest.mark.asyncio
