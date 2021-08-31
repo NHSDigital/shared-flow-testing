@@ -105,6 +105,9 @@
   <RouteRule name="NoRouteOpenAccess">
     <Condition>(proxy.pathsuffix MatchesPath "/open-access") and ((request.verb = "GET") or (request.verb = "HEAD"))</Condition>
   </RouteRule>
+  <RouteRule name="NoRouteApiKeyProtected">
+    <Condition>(proxy.pathsuffix MatchesPath "/apikey-protected") and ((request.verb = "GET") or (request.verb = "HEAD"))</Condition>
+  </RouteRule>
   <RouteRule name="shared-flow-testing-target">
     <TargetEndpoint>shared-flow-testing-target</TargetEndpoint>
   </RouteRule>
