@@ -63,11 +63,9 @@
       </Response>
       <Condition>(proxy.pathsuffix MatchesPath "/splunk-test") and ((request.verb = "GET") or (request.verb = "HEAD"))</Condition>
     </Flow>
-      <Flow name="OpenAccessEndpoint">
-
-        <Condition>(proxy.pathsuffix MatchesPath "/open-access") and ((request.verb = "GET") or (request.verb = "HEAD"))</Condition>
-
-      </Flow>
+    <Flow name="OpenAccessEndpoint">
+      <Condition>(proxy.pathsuffix MatchesPath "/open-access") and ((request.verb = "GET") or (request.verb = "HEAD"))</Condition>
+    </Flow>
   </Flows>
   <PreFlow/>
   <PostClientFlow name="PostClientFlow">

@@ -52,6 +52,9 @@ class TestSplunkLogging:
         assert auth_meta["level"] == "level3"
         assert auth_meta["provider"] == "apim"
 
+        auth_user = auth["user"]
+        assert auth_user["user_id"] == ""
+
     @pytest.mark.splunk
     @pytest.mark.asyncio
     async def test_splunk_auth_with_authorization_code(self, get_token, debug):
@@ -76,6 +79,9 @@ class TestSplunkLogging:
         assert auth_meta["grant_type"] == "authorization_code"
         assert auth_meta["level"] == "aal3"
         assert auth_meta["provider"] == "nhs-cis2"
+
+        auth_user = auth["user"]
+        assert auth_user["user_id"] == "787807429511"
 
     @pytest.mark.splunk
     @pytest.mark.asyncio
@@ -102,6 +108,9 @@ class TestSplunkLogging:
         assert auth_meta["level"] == "aal3"
         assert auth_meta["provider"] == "nhs-cis2"
 
+        auth_user = auth["user"]
+        assert auth_user["user_id"] == "lala"
+
     @pytest.mark.splunk
     @pytest.mark.asyncio
     async def test_splunk_auth_with_nhs_login_token_exchange(self, get_token_nhs_login_token_exchange, debug):
@@ -125,7 +134,10 @@ class TestSplunkLogging:
         assert auth_meta["auth_type"] == "user"
         assert auth_meta["grant_type"] == "token_exchange"
         assert auth_meta["level"] == "p9"
-        assert auth_meta["provider"] == "nhs-login"
+        assert auth_meta["provider"] == "apim-mock-nhs-login"
+
+        auth_user = auth["user"]
+        assert auth_user["user_id"] == "900000000001"
 
     @pytest.mark.splunk
     @pytest.mark.asyncio
