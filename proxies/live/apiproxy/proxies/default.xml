@@ -76,6 +76,15 @@
     </Flow>
   </Flows>
   <PreFlow/>
+  <PostFlow>
+    <Flows>
+      <Flow name="LogApiKeyProtected">
+        <Step>
+          <Name>AssignMessage.SetSplunkPayloadVars</Name>
+        </Step>
+      </Flow>
+    </Flows>
+  </PostFlow>
   <PostClientFlow name="PostClientFlow">
     <Response>
       <Step>

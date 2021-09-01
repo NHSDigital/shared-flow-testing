@@ -1,0 +1,15 @@
+<AssignMessage name="AssignMessage.SetSplunkPayloadVars">
+    <IgnoreUnresolvedVariables>false</IgnoreUnresolvedVariables>
+    <AssignVariable>
+        <Name>accesstoken.auth_type</Name>
+        <Value>app</Value>
+    </AssignVariable>
+    <AssignVariable>
+        <Name>accesstoken.auth_provider</Name>
+        <Value>apim</Value>
+    </AssignVariable>
+    <AssignVariable>
+        <Name>accesstoken.auth_level</Name>
+        <Value>Level0</Value>
+    </AssignVariable>
+</AssignMessage>
