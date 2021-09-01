@@ -76,22 +76,6 @@
     </Flow>
   </Flows>
   <PreFlow/>
-  <PostFlow>
-    <Flows>
-      <Flow name="LogApiKeyProtected">
-        <Step>
-          <Name>AssignMessage.SetSplunkPayloadVars</Name>
-        </Step>
-      </Flow>
-    </Flows>
-  </PostFlow>
-  <PostClientFlow name="PostClientFlow">
-    <Response>
-      <Step>
-        <Name>FlowCallout.LogToSplunk</Name>
-      </Step>
-    </Response>
-  </PostClientFlow>
   <HTTPProxyConnection>
     <BasePath>{{ SERVICE_BASE_PATH }}</BasePath>
     <VirtualHost>secure</VirtualHost>

@@ -142,7 +142,6 @@ class TestSplunkLogging:
 
     @pytest.mark.splunk
     @pytest.mark.asyncio
-    @pytest.mark.debug
     async def test_splunk_auth_with_apikey(self, debug):
         # Given
         apikey = APP_CLIENT_ID
@@ -161,8 +160,58 @@ class TestSplunkLogging:
 
         auth_meta = auth["meta"]
         assert auth_meta["auth_type"] == "app"
-        assert auth_meta["grant_type"] == "client_credentials"
-        assert auth_meta["level"] == "level3"
+        assert auth_meta["grant_type"] == ""
+        assert auth_meta["level"] == "Level0"
+        assert auth_meta["provider"] == "apim"
+
+        auth_user = auth["user"]
+        assert auth_user["user_id"] == ""
+
+    @pytest.mark.splunk
+    @pytest.mark.asyncio
+    async def test_splunk_auth_with_invalid_apikey(self, debug):
+        # Given
+        apikey = "invalid api key"
+
+        # When
+        await debug.start_trace()
+        requests.get(
+            url=self.apikey_protected_url,
+            headers={"apikey": apikey},
+        )
+        payload = await self._get_payload_from_splunk(debug)
+
+        # Then
+        auth = payload["auth"]
+        assert auth["access_token_hash"] == ""
+
+        auth_meta = auth["meta"]
+        assert auth_meta["auth_type"] == "app"
+        assert auth_meta["grant_type"] == ""
+        assert auth_meta["level"] == "Level0"
+        assert auth_meta["provider"] == "apim"
+
+        auth_user = auth["user"]
+        assert auth_user["user_id"] == ""
+
+    @pytest.mark.splunk
+    @pytest.mark.asyncio
+    async def test_splunk_auth_open_access(self, debug):
+        # When
+        await debug.start_trace()
+        requests.get(
+            url=self.open_access_url,
+        )
+        payload = await self._get_payload_from_splunk(debug)
+
+        # Then
+        auth = payload["auth"]
+        assert auth["access_token_hash"] == ""
+
+        auth_meta = auth["meta"]
+        assert auth_meta["auth_type"] == "app"
+        assert auth_meta["grant_type"] == ""
+        assert auth_meta["level"] == "Level0"
         assert auth_meta["provider"] == "apim"
 
         auth_user = auth["user"]
