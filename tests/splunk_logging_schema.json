@@ -120,7 +120,7 @@
         },
         "client_id": {
           "type": "string",
-          "pattern": "(^[0-9A-Za-z]{32}$)|^$"
+          "pattern": "(^[0-9A-Za-z]{32}$)|Not provided"
         },
         "application_id": {
           "type": "string",
