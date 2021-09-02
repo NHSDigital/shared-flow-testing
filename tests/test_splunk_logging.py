@@ -7,11 +7,12 @@ import pytest
 import requests
 from jsonschema import validate
 
-from .configuration.config import SERVICE_BASE_PATH, ENVIRONMENT, ACCESS_TOKEN_HASH_SECRET
+from .configuration.config import SERVICE_BASE_PATH, ENVIRONMENT, ACCESS_TOKEN_HASH_SECRET, APP_CLIENT_ID
 
 
 class TestSplunkLogging:
-    url = f"https://{ENVIRONMENT}.api.service.nhs.uk/{SERVICE_BASE_PATH}/splunk-test"
+    oauth_protected_url = f"https://{ENVIRONMENT}.api.service.nhs.uk/{SERVICE_BASE_PATH}/splunk-test"
+    apikey_protected_url = f"https://{ENVIRONMENT}.api.service.nhs.uk/{SERVICE_BASE_PATH}/apikey-protected"
     open_access_url = f"https://{ENVIRONMENT}.api.service.nhs.uk/{SERVICE_BASE_PATH}/open-access"
 
     @staticmethod
@@ -37,7 +38,7 @@ class TestSplunkLogging:
         # When
         await debug.start_trace()
         requests.get(
-            url=self.url,
+            url=self.oauth_protected_url,
             headers={"Authorization": f"Bearer {token}"},
         )
         payload = await self._get_payload_from_splunk(debug)
@@ -65,7 +66,7 @@ class TestSplunkLogging:
         # When
         await debug.start_trace()
         requests.get(
-            url=self.url,
+            url=self.oauth_protected_url,
             headers={"Authorization": f"Bearer {token}"},
         )
         payload = await self._get_payload_from_splunk(debug)
@@ -93,7 +94,7 @@ class TestSplunkLogging:
         # When
         await debug.start_trace()
         requests.get(
-            url=self.url,
+            url=self.oauth_protected_url,
             headers={"Authorization": f"Bearer {token}"},
         )
         payload = await self._get_payload_from_splunk(debug)
@@ -121,7 +122,7 @@ class TestSplunkLogging:
         # When
         await debug.start_trace()
         requests.get(
-            url=self.url,
+            url=self.oauth_protected_url,
             headers={"Authorization": f"Bearer {token}"},
         )
         payload = await self._get_payload_from_splunk(debug)
@@ -141,6 +142,162 @@ class TestSplunkLogging:
 
     @pytest.mark.splunk
     @pytest.mark.asyncio
+    async def test_splunk_auth_with_invalid_token(self, debug):
+        # Given
+        token = "invalid token"
+        expected_hashed_token = ""
+
+        # When
+        await debug.start_trace()
+        requests.get(
+            url=self.oauth_protected_url,
+            headers={"Authorization": f"Bearer {token}"},
+        )
+        payload = await self._get_payload_from_splunk(debug)
+
+        # Then
+        auth = payload["auth"]
+        assert auth["access_token_hash"] == expected_hashed_token
+
+        auth_meta = auth["meta"]
+        assert auth_meta["auth_type"] == "app"
+        assert auth_meta["grant_type"] == ""
+        assert auth_meta["level"] == "Level0"
+        assert auth_meta["provider"] == "apim"
+
+        auth_user = auth["user"]
+        assert auth_user["user_id"] == ""
+
+        meta = payload["meta"]
+        assert meta["client_id"] == "Not provided"
+        assert meta["application"] == "unknown"
+        assert meta["product"] == ""
+
+    @pytest.mark.splunk
+    @pytest.mark.asyncio
+    async def test_splunk_auth_with_expired_token(self, debug):
+        # Given
+        token = "zRygtc34R2pwxbiUktLsMJWX0iJW"
+        expected_hashed_token = ""
+
+        # When
+        await debug.start_trace()
+        requests.get(
+            url=self.oauth_protected_url,
+            headers={"Authorization": f"Bearer {token}"},
+        )
+        payload = await self._get_payload_from_splunk(debug)
+
+        # Then
+        auth = payload["auth"]
+        assert auth["access_token_hash"] == expected_hashed_token
+
+        auth_meta = auth["meta"]
+        assert auth_meta["auth_type"] == "app"
+        assert auth_meta["grant_type"] == ""
+        assert auth_meta["level"] == "Level0"
+        assert auth_meta["provider"] == "apim"
+
+        auth_user = auth["user"]
+        assert auth_user["user_id"] == ""
+
+        meta = payload["meta"]
+        assert meta["client_id"] == "Not provided"
+        assert meta["application"] == "unknown"
+        assert meta["product"] == ""
+
+    @pytest.mark.splunk
+    @pytest.mark.asyncio
+    @pytest.mark.debug
+    async def test_splunk_auth_with_apikey(self, debug):
+        # Given
+        apikey = APP_CLIENT_ID
+
+        # When
+        await debug.start_trace()
+        requests.get(
+            url=self.apikey_protected_url,
+            headers={"apikey": apikey},
+        )
+        payload = await self._get_payload_from_splunk(debug)
+
+        # Then
+        auth = payload["auth"]
+        assert auth["access_token_hash"] == ""
+
+        auth_meta = auth["meta"]
+        assert auth_meta["auth_type"] == "app"
+        assert auth_meta["grant_type"] == ""
+        assert auth_meta["level"] == "Level0"
+        assert auth_meta["provider"] == "apim"
+
+        auth_user = auth["user"]
+        assert auth_user["user_id"] == ""
+
+        meta = payload["meta"]
+        assert meta["client_id"] == apikey
+
+    @pytest.mark.splunk
+    @pytest.mark.asyncio
+    async def test_splunk_auth_with_invalid_apikey(self, debug):
+        # Given
+        apikey = "invalid api key"
+
+        # When
+        await debug.start_trace()
+        requests.get(
+            url=self.apikey_protected_url,
+            headers={"apikey": apikey},
+        )
+        payload = await self._get_payload_from_splunk(debug)
+
+        # Then
+        auth = payload["auth"]
+        assert auth["access_token_hash"] == ""
+
+        auth_meta = auth["meta"]
+        assert auth_meta["auth_type"] == "app"
+        assert auth_meta["grant_type"] == ""
+        assert auth_meta["level"] == "Level0"
+        assert auth_meta["provider"] == "apim"
+
+        auth_user = auth["user"]
+        assert auth_user["user_id"] == ""
+
+        meta = payload["meta"]
+        assert meta["client_id"] == "Not provided"
+        assert meta["application"] == "unknown"
+        assert meta["product"] == ""
+
+    @pytest.mark.splunk
+    @pytest.mark.asyncio
+    async def test_splunk_auth_open_access(self, debug):
+        # When
+        await debug.start_trace()
+        requests.get(
+            url=self.open_access_url,
+        )
+        payload = await self._get_payload_from_splunk(debug)
+
+        # Then
+        auth = payload["auth"]
+        assert auth["access_token_hash"] == ""
+
+        auth_meta = auth["meta"]
+        assert auth_meta["auth_type"] == "app"
+        assert auth_meta["grant_type"] == ""
+        assert auth_meta["level"] == "Level0"
+        assert auth_meta["provider"] == "apim"
+
+        auth_user = auth["user"]
+        assert auth_user["user_id"] == ""
+
+        meta = payload["meta"]
+        assert meta["client_id"] == "Not provided"
+        assert meta["application"] == "unknown"
+
+    @pytest.mark.splunk
+    @pytest.mark.asyncio
     async def test_splunk_payload_schema(self, get_token, debug):
         # Given
         token = get_token["access_token"]
@@ -148,7 +305,7 @@ class TestSplunkLogging:
         # When
         await debug.start_trace()
         requests.get(
-            url=self.url,
+            url=self.oauth_protected_url,
             headers={"Authorization": f"Bearer {token}"},
         )
         payload = await self._get_payload_from_splunk(debug)
