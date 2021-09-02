@@ -175,7 +175,6 @@ class TestSplunkLogging:
 
     @pytest.mark.splunk
     @pytest.mark.asyncio
-    @pytest.mark.debug
     async def test_splunk_auth_with_expired_token(self, debug):
         # Given
         token = "zRygtc34R2pwxbiUktLsMJWX0iJW"
