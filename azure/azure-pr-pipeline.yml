@@ -42,6 +42,8 @@ extends:
     secret_ids:
       - ptl/monitoring/status-endpoint-api-key
       - ptl/app-credentials/identity-service/non-prod/ACCESS_TOKEN_SECRET
+    config_ids:
+      - /ptl/azure-devops/env-internal-dev/test-app/internal-testing-internal-dev/CLIENT_ID
     apigee_deployments:
       - environment: internal-dev
         make_spec_visible: true
