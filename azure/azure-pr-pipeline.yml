@@ -39,6 +39,7 @@ extends:
       - ptl/app-credentials/jwt_testing/non-prod/JWT_TESTING_PRIVATE_KEY
       - ptl/app-credentials/jwt_testing/non-prod/ID_TOKEN_TESTING_PRIVATE_KEY
       - ptl/app-credentials/jwt_testing/non-prod/ID_TOKEN_NHS_LOGIN_PRIVATE_KEY
+      - ptl/azure-devops/env-internal-dev/test-app/internal-testing-internal-dev/CLIENT_ID
     secret_ids:
       - ptl/monitoring/status-endpoint-api-key
       - ptl/app-credentials/identity-service/non-prod/ACCESS_TOKEN_SECRET
@@ -47,8 +48,8 @@ extends:
         make_spec_visible: true
         # Enable integration tests when you open a pr. Run tests and once you're happy comment out tests.
         # Merge your branch to master and then apply shared-flow changes in the infrastructure repo.
-#        post_deploy:
-#          - template: ./templates/run-integration-tests.yml
+        post_deploy:
+          - template: ./templates/run-integration-tests.yml
     # - environment: internal-dev-sandbox
     #   proxy_path: sandbox
     #   post_deploy:
