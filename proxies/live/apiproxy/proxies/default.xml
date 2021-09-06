@@ -83,9 +83,10 @@
       </Step>
     </Response>
   </PostClientFlow>
-  <HTTPTargetConnection>
-    {{ HOSTED_TARGET_CONNECTION }}
-  </HTTPTargetConnection>
+  <HTTPProxyConnection>
+    <BasePath>{{ SERVICE_BASE_PATH }}</BasePath>
+    <VirtualHost>secure</VirtualHost>
+  </HTTPProxyConnection>
   <RouteRule name="NoRoute">
     <Condition>(request.verb = "OPTIONS") and (request.header.origin != null) and (request.header.Access-Control-Request-Method != null)</Condition>
   </RouteRule>
