@@ -23,6 +23,13 @@
       </Step>
     </Request>
   </PreFlow>
+  <PostFlow>
+    <Response>
+      <Step>
+        <Name>JavaScript.SetLoggingFields</Name>
+      </Step>
+    </Response>
+  </PostFlow>
   <!--
     To point to a named target server as this is how it SHOULD be implemented:
     For example:

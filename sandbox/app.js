@@ -127,6 +127,11 @@ app.get("/_ping", handlers.status);
 app.get("/_status", handlers.status);
 app.get("/health", handlers.status);
 app.all("/hello", handlers.hello);
+
+app.get("/open-access", handlers.sampleResponse);
+app.get("/splunk-test", handlers.sampleResponse);
+app.get("/apikey-protected", handlers.sampleResponse);
+
 app.use(on_error)
 app.use(after_request);
 
