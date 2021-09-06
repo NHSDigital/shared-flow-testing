@@ -76,6 +76,13 @@
     </Flow>
   </Flows>
   <PreFlow/>
+  <PostFlow>
+    <Response>
+      <Step>
+        <Name>JavaScript.SetLoggingFields</Name>
+      </Step>
+    </Response>
+  </PostFlow>
   <PostClientFlow name="PostClientFlow">
     <Response>
       <Step>
