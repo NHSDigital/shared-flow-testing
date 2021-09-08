@@ -62,7 +62,12 @@ async function hello(req, res, next) {
     next();
 }
 
+async function sampleResponse(req, res, next) {
+    res.json({message: "share-flow-testing"})
+}
+
 module.exports = {
     status: status,
-    hello: hello
+    hello: hello,
+    sampleResponse: sampleResponse
 };
