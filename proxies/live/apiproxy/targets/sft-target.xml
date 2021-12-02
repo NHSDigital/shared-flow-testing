@@ -18,6 +18,9 @@
       <Step>
         <Name>SpikeArrest</Name>
       </Step>
+      <Step>
+        <Name>FlowCallout.ComplexAttribute</Name>
+      </Step>
     </Request>
   </PreFlow>
   <!--
