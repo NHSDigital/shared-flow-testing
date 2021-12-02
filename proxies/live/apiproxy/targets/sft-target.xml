@@ -19,6 +19,9 @@
         <Name>SpikeArrest</Name>
       </Step>
       <Step>
+        <Name>OauthV2.VerifyAccessToken</Name>
+      </Step>
+      <Step>
         <Name>FlowCallout.ComplexAttribute</Name>
       </Step>
     </Request>
