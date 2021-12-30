@@ -110,6 +110,9 @@
   <RouteRule name="NoRouteUserServiceRole">
     <Condition>(proxy.pathsuffix MatchesPath "/user-role-service") and ((request.verb = "GET") or (request.verb = "HEAD"))</Condition>
   </RouteRule>
+  <RouteRule name="NoRouteExtendedAttributes">
+    <Condition>(proxy.pathsuffix MatchesPath "/extended-attributes") and ((request.verb = "GET") or (request.verb = "HEAD"))</Condition>
+  </RouteRule>
   <RouteRule name="shared-flow-testing-target">
     <TargetEndpoint>shared-flow-testing-target</TargetEndpoint>
   </RouteRule>
