@@ -69,6 +69,14 @@
     <Flow name="OpenAccessEndpoint">
       <Condition>(proxy.pathsuffix MatchesPath "/open-access") and ((request.verb = "GET") or (request.verb = "HEAD"))</Condition>
     </Flow>
+    <Flow name="ExtendedAttributes">
+      <Request>
+        <Step>
+          <Name>FlowCallout.ExtendedAttributes</Name>
+        </Step>
+      </Request>
+<!--      <Condition>(proxy.pathsuffix MatchesPath "/apikey-protected") and ((request.verb = "GET") or (request.verb = "HEAD"))</Condition>-->
+    </Flow>
   </Flows>
   <PreFlow/>
   <PostClientFlow name="PostClientFlow">
