@@ -72,10 +72,18 @@
     <Flow name="ExtendedAttributes">
       <Request>
         <Step>
+          <Name>OauthV2.VerifyAccessToken</Name>
+        </Step>
+        <Step>
           <Name>FlowCallout.ExtendedAttributes</Name>
         </Step>
       </Request>
-<!--      <Condition>(proxy.pathsuffix MatchesPath "/apikey-protected") and ((request.verb = "GET") or (request.verb = "HEAD"))</Condition>-->
+      <Response>
+        <Step>
+          <Name>AssignMessage.AddPayloadToPing</Name>
+        </Step>
+      </Response>
+      <Condition>(proxy.pathsuffix MatchesPath "/extended-attributes") and ((request.verb = "GET") or (request.verb = "HEAD"))</Condition>
     </Flow>
   </Flows>
   <PreFlow/>
