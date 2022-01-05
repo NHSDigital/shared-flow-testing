@@ -69,6 +69,22 @@
     <Flow name="OpenAccessEndpoint">
       <Condition>(proxy.pathsuffix MatchesPath "/open-access") and ((request.verb = "GET") or (request.verb = "HEAD"))</Condition>
     </Flow>
+    <Flow name="ExtendedAttributes">
+      <Request>
+        <Step>
+          <Name>OauthV2.VerifyAccessToken</Name>
+        </Step>
+        <Step>
+          <Name>FlowCallout.ExtendedAttributes</Name>
+        </Step>
+      </Request>
+      <Response>
+        <Step>
+          <Name>AssignMessage.AddPayloadToPing</Name>
+        </Step>
+      </Response>
+      <Condition>(proxy.pathsuffix MatchesPath "/extended-attributes") and ((request.verb = "GET") or (request.verb = "HEAD"))</Condition>
+    </Flow>
   </Flows>
   <PreFlow/>
   <PostClientFlow name="PostClientFlow">
@@ -93,6 +109,9 @@
   </RouteRule>
   <RouteRule name="NoRouteUserServiceRole">
     <Condition>(proxy.pathsuffix MatchesPath "/user-role-service") and ((request.verb = "GET") or (request.verb = "HEAD"))</Condition>
+  </RouteRule>
+  <RouteRule name="NoRouteExtendedAttributes">
+    <Condition>(proxy.pathsuffix MatchesPath "/extended-attributes") and ((request.verb = "GET") or (request.verb = "HEAD"))</Condition>
   </RouteRule>
   <RouteRule name="shared-flow-testing-target">
     <TargetEndpoint>shared-flow-testing-target</TargetEndpoint>
