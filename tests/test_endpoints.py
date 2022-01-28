@@ -51,14 +51,14 @@ class TestEndpoints:
             {}
         ),
         (
-            "787807429512",  # User role in user info (no header, not in id token),
+            "787807429512",  # User role in user info - one role - (no header, not in id token),
             200,
             {}
         ),
         (
-            "Aal3",  # User role sent in header (no in id token, not in user info)
+            "656005750104",  # User role sent in header (no in id token, multiple in user info)
             200,
-            {"NHSD-Session-URID": "555254242102"}
+            {"NHSD-Session-URID": "656014452101"}
         )
     ])
     async def test_user_role_happy_path(self, test_app_and_product, webdriver_session,
@@ -105,7 +105,7 @@ class TestEndpoints:
             "nhsid_nrbac_roles is misconfigured/invalid"
         ),
         (
-            "Aal3",  # Invalid role in header
+            "656005750104",  # Invalid role in header
             400,
             {"NHSD-Session-URID": "notAuserRole123"},
             "nhsd-session-urid is invalid"
