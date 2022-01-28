@@ -84,7 +84,7 @@ class TestEndpoints:
             "656005750104",  # Multiple user roles found in userinfo
             400,
             {},
-            "multiple roles found in user info"
+            "multiple roles found in user info, please check nhsd-session-urid is valid"
         ),
         (
             "Aal3",  # No user role provided by any means
