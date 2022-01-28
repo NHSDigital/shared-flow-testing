@@ -56,7 +56,7 @@ class TestEndpoints:
             {}
         ),
         (
-            "Aal3",  # User role sent in header
+            "Aal3",  # User role sent in header (no in id token, not in user info)
             200,
             {"NHSD-Session-URID": "555254242102"}
         )
@@ -105,18 +105,10 @@ class TestEndpoints:
             "nhsid_nrbac_roles is misconfigured/invalid"
         ),
         (
-            # TODO not sure if this will work, sending an invalid user? will try and run a manual test
-            "notAValidUser",  # Unable to get user info for this user
-            400,
-            {},
-            "unable to retrieve user info"
-        ),
-        (
-            # TODO - This must be implemented in the flow logic as error + then have the error descp filled in below
             "Aal3",  # Invalid role in header
             400,
             {"NHSD-Session-URID": "notAuserRole123"},
-            ""
+            "nhsd-session-urid is invalid"
         )
     ])
     async def test_user_role_unhappy_path(self, test_app_and_product, webdriver_session,
@@ -129,14 +121,10 @@ class TestEndpoints:
         for key, value in additional_headers.items():
             headers[key] = value
 
-        await debug.start_trace()
-
         response = requests.get(
             url=f"https://internal-dev.api.service.nhs.uk/{config.SERVICE_BASE_PATH}/user-role-service",
             headers=headers
         )
 
-        isSharedFlowError = await debug.get_apigee_variable_from_trace(name='sharedFlow.userRoleError')
-        assert isSharedFlowError == 'true'
         assert response.status_code == status_code
         assert response.json()["issue"][0]["diagnostics"] == error_description
