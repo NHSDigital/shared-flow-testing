@@ -24,7 +24,6 @@ class TestEndpoints:
 
         return token_resp["body"]["access_token"]
 
-    @pytest.mark.skip
     @pytest.mark.asyncio
     @pytest.mark.parametrize("user_id,status_code,additional_headers", [
         (
@@ -60,7 +59,6 @@ class TestEndpoints:
 
         assert response.status_code == status_code
 
-    @pytest.mark.skip
     @pytest.mark.asyncio
     @pytest.mark.parametrize("user_id,status_code,additional_headers,error_description", [
         (
