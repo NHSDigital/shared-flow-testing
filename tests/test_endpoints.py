@@ -24,25 +24,7 @@ class TestEndpoints:
 
         return token_resp["body"]["access_token"]
 
-    async def call_user_info(self, test_app, access_token):
-        user_info_resp = await test_app.oauth.hit_oauth_endpoint(
-            method="GET",
-            endpoint="userinfo",
-            headers={"Authorization": f"Bearer {access_token}"}
-        )
-
-        return user_info_resp
-
-    @pytest.mark.asyncio
-    async def test_mock_auth(self, test_app_and_product, webdriver_session):
-        test_product, test_app = test_app_and_product
-        user_id = "656005750107"
-        access_token = await self.get_access_token(test_app, user_id, webdriver_session)
-
-        userinfo_resp = await self.call_user_info(test_app, access_token)
-
-        assert userinfo_resp['status_code'] == 200
-
+    @pytest.mark.skip
     @pytest.mark.asyncio
     @pytest.mark.parametrize("user_id,status_code,additional_headers", [
         (
@@ -78,6 +60,7 @@ class TestEndpoints:
 
         assert response.status_code == status_code
 
+    @pytest.mark.skip
     @pytest.mark.asyncio
     @pytest.mark.parametrize("user_id,status_code,additional_headers,error_description", [
         (
@@ -128,3 +111,17 @@ class TestEndpoints:
 
         assert response.status_code == status_code
         assert response.json()["issue"][0]["diagnostics"] == error_description
+    
+    @pytest.mark.asyncio
+    async def test_nhs_login_exchanged_token_no_role_provided(
+            self, get_token_nhs_login_token_exchange
+    ):
+        token = get_token_nhs_login_token_exchange["access_token"]
+
+        response = requests.get(
+            url=f"https://internal-dev.api.service.nhs.uk/{config.SERVICE_BASE_PATH}/user-role-service",
+            headers={"Authorization": f"Bearer {token}"},
+        )
+
+        assert response.status_code == 400
+        assert response.json()["issue"][0]["diagnostics"] == "selected_roleid is misconfigured/invalid"
