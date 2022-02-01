@@ -19,7 +19,7 @@ steps:
     export ID_TOKEN_PRIVATE_KEY_ABSOLUTE_PATH="$(Pipeline.Workspace)/secrets/$(ID_TOKEN_TESTING_PRIVATE_KEY)"
     export STATUS_ENDPOINT_API_KEY="$(status-endpoint-api-key)"
     export APIGEE_API_TOKEN="$(secret.AccessToken)"
-    export OAUTH_PROXY="oauth2"
+    export OAUTH_PROXY="oauth2-mock"
     export APP_CLIENT_ID="$(CLIENT_ID)"
     export OAUTH_BASE_URI="https://$(APIGEE_ENVIRONMENT).api.service.nhs.uk"
     export ACCESS_TOKEN_HASH_SECRET="$(ACCESS_TOKEN_SECRET)"
