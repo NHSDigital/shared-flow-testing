@@ -20,6 +20,11 @@ python = "^3.8"
 requests = "^2.25.1"
 assertpy = "^1.1"
 pytest-docker = "^0.10.3"
+pytest-xdist = "^2.5.0"
+pytest-sugar = "^0.9.4"
+PyJWT = "^2.3.0"
+python-dotenv = "^0.19.2"
+pytest-rerunfailures = "^10.2"
 
 [tool.poetry.dev-dependencies]
 flake8 = "^3.7.9"
