@@ -65,7 +65,7 @@ class TestEndpoints:
             "656005750104",  # Multiple user roles found in userinfo
             400,
             {},
-            "multiple roles found in user info, please check nhsd-session-urid is valid"
+            "multiple roles found in user info, please check nhsd-session-urid"
         ),
         (
             "Aal3",  # No user role provided by any means
@@ -122,4 +122,4 @@ class TestEndpoints:
         )
 
         assert response.status_code == 400
-        assert response.json()["issue"][0]["diagnostics"] == "selected_roleid is misconfigured/invalid"
+        assert response.json()["issue"][0]["diagnostics"] == "selected_roleid is missing in your token"

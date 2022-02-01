@@ -23,6 +23,7 @@ steps:
     export APP_CLIENT_ID="$(CLIENT_ID)"
     export OAUTH_BASE_URI="https://$(APIGEE_ENVIRONMENT).api.service.nhs.uk"
     export ACCESS_TOKEN_HASH_SECRET="$(ACCESS_TOKEN_SECRET)"
+    docker ps
     ./test_env/bin/pytest --reruns 2 --reruns-delay 1 -v --junitxml=test-report.xml
    workingDirectory: $(Pipeline.Workspace)/s/$(SERVICE_NAME)/$(SERVICE_ARTIFACT_NAME)/tests
    displayName: run smoketests
