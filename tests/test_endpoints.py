@@ -6,23 +6,23 @@ from .configuration import config
 
 class TestEndpoints:
     """ A test suite for testing endpoints"""
-    async def get_access_token(self, test_app, user_id, webdriver_session):
+    async def get_access_token(self, test_app, user_id):
 
-        code = await test_app.oauth.get_authenticated_with_mock_auth(user_id, webdriver_session)
+        token_resp = test_app.oauth.get_authenticated_with_mock_auth(user_id)
 
-        token_resp = await test_app.oauth.hit_oauth_endpoint(
-            method="POST",
-            endpoint="token",
-            data={
-                'client_id': test_app.oauth.client_id,
-                'client_secret': test_app.oauth.client_secret,
-                'grant_type': "authorization_code",
-                'redirect_uri': test_app.oauth.redirect_uri,
-                'code': code
-            }
-        )
+        # token_resp = await test_app.oauth.hit_oauth_endpoint(
+        #     method="POST",
+        #     endpoint="token",
+        #     data={
+        #         'client_id': test_app.oauth.client_id,
+        #         'client_secret': test_app.oauth.client_secret,
+        #         'grant_type': "authorization_code",
+        #         'redirect_uri': test_app.oauth.redirect_uri,
+        #         'code': code
+        #     }
+        # )
 
-        return token_resp["body"]["access_token"]
+        return token_resp["access_token"]
 
     @pytest.mark.asyncio
     @pytest.mark.parametrize("user_id,status_code,additional_headers", [
@@ -42,10 +42,10 @@ class TestEndpoints:
             {"NHSD-Session-URID": "656014452101"}
         )
     ])
-    async def test_user_role_happy_path(self, test_app_and_product, webdriver_session,
+    async def test_user_role_happy_path(self, test_app_and_product,
                                         user_id, status_code, additional_headers):
         test_product, test_app = test_app_and_product
-        access_token = await self.get_access_token(test_app, user_id, webdriver_session)
+        access_token = await self.get_access_token(test_app, user_id)
         headers = {
                 "Authorization": f"Bearer {access_token}",
         }
@@ -92,10 +92,10 @@ class TestEndpoints:
             "nhsd-session-urid is invalid"
         )
     ])
-    async def test_user_role_unhappy_path(self, test_app_and_product, webdriver_session,
-                                          debug, user_id, status_code, additional_headers, error_description):
+    async def test_user_role_unhappy_path(self, test_app_and_product,
+                                          user_id, status_code, additional_headers, error_description):
         test_product, test_app = test_app_and_product
-        access_token = await self.get_access_token(test_app, user_id, webdriver_session)
+        access_token = await self.get_access_token(test_app, user_id)
         headers = {
                 "Authorization": f"Bearer {access_token}",
         }

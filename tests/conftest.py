@@ -10,9 +10,9 @@ from api_test_utils.oauth_helper import OauthHelper
 
 from .configuration import config
 
-pytest_plugins = [
-   "api_test_utils.fixtures",
-]
+# pytest_plugins = [
+#    "api_test_utils.fixtures",
+# ]
 
 @pytest.fixture(scope='session')
 def api_test_config() -> APITestSessionConfig:
@@ -67,7 +67,7 @@ async def test_app_and_product(app, product):
 
     await app.create_new_app()
 
-    await product.update_proxies([f"identity-service-mock-internal-dev", "shared-flow-testing-internal-dev"])
+    await product.update_proxies([f"identity-service-mock-internal-dev", config.SERVICE_NAME])
 
     app.oauth = OauthHelper(app.client_id, app.client_secret, app.callback_url)
 
