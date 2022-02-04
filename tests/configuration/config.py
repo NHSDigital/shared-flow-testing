@@ -14,3 +14,4 @@ SERVICE_BASE_PATH = ENV['service_base_path']
 SERVICE_NAME = ENV['service_name']
 ACCESS_TOKEN_HASH_SECRET = environ.get("ACCESS_TOKEN_HASH_SECRET")
 APP_CLIENT_ID = environ.get("APP_CLIENT_ID")
+OAUTH_PROXY = environ.get("OAUTH_PROXY")

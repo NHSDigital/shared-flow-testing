@@ -5,9 +5,6 @@ steps:
     versionSpec: "3.9"
 
  - bash: |
-    # pip install virtualenv
-    # virtualenv test_env
-    # source ./test_env/bin/activate
     poetry install
    workingDirectory: $(Pipeline.Workspace)/s/$(SERVICE_NAME)/$(SERVICE_ARTIFACT_NAME)/tests
    displayName: Setup integration tests
