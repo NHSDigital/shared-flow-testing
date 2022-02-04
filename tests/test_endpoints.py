@@ -12,6 +12,7 @@ class TestEndpoints:
 
         return token_resp["access_token"]
 
+    @pytest.mark.mock_auth
     @pytest.mark.asyncio
     @pytest.mark.parametrize("user_id,status_code,additional_headers", [
         (
@@ -47,6 +48,7 @@ class TestEndpoints:
 
         assert response.status_code == status_code
 
+    @pytest.mark.mock_auth
     @pytest.mark.asyncio
     @pytest.mark.parametrize("user_id,status_code,additional_headers,error_description", [
         (
@@ -98,6 +100,7 @@ class TestEndpoints:
         assert response.status_code == status_code
         assert response.json()["issue"][0]["diagnostics"] == error_description
 
+    @pytest.mark.mock_auth
     @pytest.mark.asyncio
     async def test_nhs_login_exchanged_token_no_role_provided(
             self, get_token_nhs_login_token_exchange

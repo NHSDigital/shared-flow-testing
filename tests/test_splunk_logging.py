@@ -29,6 +29,7 @@ class TestSplunkLogging:
 
         return base64.b64encode(signature.digest()).decode("utf-8")
 
+    @pytest.mark.simulated_auth
     @pytest.mark.splunk
     @pytest.mark.asyncio
     async def test_splunk_auth_with_client_credentials(self, get_token_client_credentials, debug):
@@ -57,6 +58,7 @@ class TestSplunkLogging:
         auth_user = auth["user"]
         assert auth_user["user_id"] == ""
 
+    @pytest.mark.simulated_auth
     @pytest.mark.splunk
     @pytest.mark.asyncio
     async def test_splunk_auth_with_authorization_code(self, get_token, debug):
@@ -85,6 +87,7 @@ class TestSplunkLogging:
         auth_user = auth["user"]
         assert auth_user["user_id"] == "787807429511"
 
+    @pytest.mark.simulated_auth
     @pytest.mark.splunk
     @pytest.mark.asyncio
     async def test_splunk_auth_with_cis2_token_exchange(self, get_token_cis2_token_exchange, debug):
@@ -113,6 +116,7 @@ class TestSplunkLogging:
         auth_user = auth["user"]
         assert auth_user["user_id"] == "lala"
 
+    @pytest.mark.simulated_auth
     @pytest.mark.splunk
     @pytest.mark.asyncio
     async def test_splunk_auth_with_nhs_login_token_exchange(self, get_token_nhs_login_token_exchange, debug):
@@ -141,6 +145,7 @@ class TestSplunkLogging:
         auth_user = auth["user"]
         assert auth_user["user_id"] == "900000000001"
 
+    @pytest.mark.simulated_auth
     @pytest.mark.splunk
     @pytest.mark.asyncio
     async def test_splunk_auth_with_invalid_token(self, debug):
@@ -174,6 +179,7 @@ class TestSplunkLogging:
         assert meta["application"] == "unknown"
         assert meta["product"] == ""
 
+    @pytest.mark.simulated_auth
     @pytest.mark.splunk
     @pytest.mark.asyncio
     async def test_splunk_auth_with_expired_token(self, debug):
@@ -207,6 +213,7 @@ class TestSplunkLogging:
         assert meta["application"] == "unknown"
         assert meta["product"] == ""
 
+    @pytest.mark.simulated_auth
     @pytest.mark.splunk
     @pytest.mark.asyncio
     async def test_splunk_auth_with_apikey(self, debug):
@@ -237,6 +244,7 @@ class TestSplunkLogging:
         meta = payload["meta"]
         assert meta["client_id"] == apikey
 
+    @pytest.mark.simulated_auth
     @pytest.mark.splunk
     @pytest.mark.asyncio
     async def test_splunk_auth_with_invalid_apikey(self, debug):
@@ -269,6 +277,7 @@ class TestSplunkLogging:
         assert meta["application"] == "unknown"
         assert meta["product"] == ""
 
+    @pytest.mark.simulated_auth
     @pytest.mark.splunk
     @pytest.mark.asyncio
     async def test_splunk_auth_open_access(self, debug):
@@ -296,6 +305,7 @@ class TestSplunkLogging:
         assert meta["client_id"] == "empty"
         assert meta["application"] == "unknown"
 
+    @pytest.mark.simulated_auth
     @pytest.mark.splunk
     @pytest.mark.asyncio
     async def test_splunk_auth_open_access_ping(self, debug):
@@ -324,6 +334,7 @@ class TestSplunkLogging:
         assert meta["client_id"] == "empty"
         assert meta["application"] == "unknown"
 
+    @pytest.mark.simulated_auth
     @pytest.mark.splunk
     @pytest.mark.asyncio
     async def test_splunk_payload_schema(self, get_token, debug):
@@ -344,6 +355,7 @@ class TestSplunkLogging:
         # If no exception is raised by validate(), the instance is valid.
         validate(instance=payload, schema=schema)
 
+    @pytest.mark.simulated_auth
     @pytest.mark.splunk
     @pytest.mark.asyncio
     async def test_splunk_payload_schema_open_access(self, debug):
