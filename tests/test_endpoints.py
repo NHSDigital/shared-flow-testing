@@ -10,18 +10,6 @@ class TestEndpoints:
 
         token_resp = test_app.oauth.get_authenticated_with_mock_auth(user_id)
 
-        # token_resp = await test_app.oauth.hit_oauth_endpoint(
-        #     method="POST",
-        #     endpoint="token",
-        #     data={
-        #         'client_id': test_app.oauth.client_id,
-        #         'client_secret': test_app.oauth.client_secret,
-        #         'grant_type': "authorization_code",
-        #         'redirect_uri': test_app.oauth.redirect_uri,
-        #         'code': code
-        #     }
-        # )
-
         return token_resp["access_token"]
 
     @pytest.mark.asyncio

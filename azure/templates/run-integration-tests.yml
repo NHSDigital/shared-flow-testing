@@ -1,9 +1,14 @@
 steps:
+ - task: UsePythonVersion@0
+   displayName: "Use Python 3.9"
+   inputs:
+    versionSpec: "3.9"
+
  - bash: |
-    # pip install virtualenv
-    # virtualenv test_env
-    # source ./test_env/bin/activate
-    poetry install
+    pip install virtualenv
+    virtualenv test_env
+    source ./test_env/bin/activate
+    # poetry install
    workingDirectory: $(Pipeline.Workspace)/s/$(SERVICE_NAME)/$(SERVICE_ARTIFACT_NAME)/tests
    displayName: Setup integration tests
 
@@ -24,8 +29,8 @@ steps:
     export OAUTH_BASE_URI="https://$(APIGEE_ENVIRONMENT).api.service.nhs.uk"
     export ACCESS_TOKEN_HASH_SECRET="$(ACCESS_TOKEN_SECRET)"
 
-    poetry run pytest test_endpoints.py -v --junitxml=test-report.xml
-    # ./test_env/bin/pytest --reruns 2 --reruns-delay 1 -v --junitxml=test-report.xml
+    # poetry run pytest -v --junitxml=test-report.xml
+    ./test_env/bin/pytest --reruns 2 --reruns-delay 1 -v --junitxml=test-report.xml
    workingDirectory: $(Pipeline.Workspace)/s/$(SERVICE_NAME)/$(SERVICE_ARTIFACT_NAME)/tests
    displayName: run smoketests
 
