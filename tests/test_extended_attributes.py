@@ -11,6 +11,7 @@ from .configuration import config
 
 class TestExtendedAttributes:
 
+    @pytest.mark.simulated_auth
     @pytest.mark.asyncio
     async def test_single_attribute(self, test_app_and_product, debug):
         # Given
@@ -38,6 +39,7 @@ class TestExtendedAttributes:
         assert_that(extended_attributes).is_not_none()
         assert_that(flow_variable).is_equal_to('true')
 
+    @pytest.mark.simulated_auth
     @pytest.mark.asyncio
     async def test_multiple_attributes(self, test_app_and_product, debug):
         # Given
@@ -69,6 +71,7 @@ class TestExtendedAttributes:
         assert_that(flow_variable_attr_b).is_not_none()
         assert_that(flow_variable_attr_b).is_equal_to('value_b')
 
+    @pytest.mark.simulated_auth
     @pytest.mark.asyncio
     async def test_no_attribute(self, test_app_and_product, debug):
         # Given
@@ -83,6 +86,7 @@ class TestExtendedAttributes:
         assert_that(200).is_equal_to(response.status_code)
         assert_that(extended_attributes).is_empty()
 
+    @pytest.mark.simulated_auth
     @pytest.mark.asyncio
     async def test_invalid_json(self, test_app_and_product, debug):
         # Given

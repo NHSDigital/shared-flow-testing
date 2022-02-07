@@ -64,6 +64,12 @@ async def test_app_and_product(app, product):
 
     await app.create_new_app()
 
+    identity_service_proxy = "identity-service-mock-internal-dev" if config.OAUTH_PROXY == "oauth2-mock" else "identity-service-internal-dev"
+
+    await product.update_proxies([identity_service_proxy, config.SERVICE_NAME])
+
+    app.oauth = OauthHelper(app.client_id, app.client_secret, app.callback_url)
+
     await product.update_scopes(
         [
             "urn:nhsd:apim:app:level3:shared-flow-testing",
