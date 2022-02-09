@@ -135,7 +135,7 @@ async def get_token_cis2_token_exchange(test_app_and_product):
 
     claims = {
         'at_hash': 'tf_-lqpq36lwO7WmSBIJ6Q',
-        'sub': '656005750107',
+        'sub': 'lala',
         'auditTrackingId': '91f694e6-3749-42fd-90b0-c3134b0d98f6-1546391',
         'amr': ['N3_SMARTCARD'],
         'iss': 'https://am.nhsint.auth-ptl.cis2.spineservices.nhs.uk:443/'
