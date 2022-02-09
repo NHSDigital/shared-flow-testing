@@ -1,4 +1,3 @@
-import py
 import pytest
 import requests
 
