@@ -135,7 +135,7 @@ async def get_token_cis2_token_exchange(test_app_and_product):
 
     claims = {
         'at_hash': 'tf_-lqpq36lwO7WmSBIJ6Q',
-        'sub': 'lala',
+        'sub': '656005750107',
         'auditTrackingId': '91f694e6-3749-42fd-90b0-c3134b0d98f6-1546391',
         'amr': ['N3_SMARTCARD'],
         'iss': 'https://am.nhsint.auth-ptl.cis2.spineservices.nhs.uk:443/'
@@ -151,7 +151,8 @@ async def get_token_cis2_token_exchange(test_app_and_product):
         'realm': '/NHSIdentity/Healthcare',
         'exp': int(time()) + 6000,
         'tokenType': 'JWTToken',
-        'iat': int(time()) - 100
+        'iat': int(time()) - 100,
+        'selected_roleid': '555254242105'
     }
 
     with open(config.ID_TOKEN_PRIVATE_KEY_ABSOLUTE_PATH, "r") as f:
@@ -171,6 +172,7 @@ async def get_token_cis2_token_exchange(test_app_and_product):
             "client_assertion": client_assertion_jwt,
         },
     )
+
     assert token_resp["status_code"] == 200
     return token_resp["body"]
 
