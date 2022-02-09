@@ -132,13 +132,13 @@ class TestEndpoints:
 
         assert response.status_code == 400
         assert response.json()["issue"][0]["diagnostics"] == error_description
-    
+
     @pytest.mark.simulated_auth
     @pytest.mark.asyncio
     async def test_cis2_exchanged_token_happy_path(
             self,
             get_token_cis2_token_exchange
-        ):
+    ):
         token = get_token_cis2_token_exchange["access_token"]
         headers = {
                 "Authorization": f"Bearer {token}",
@@ -150,13 +150,13 @@ class TestEndpoints:
         )
 
         assert response.status_code == 200
-    
+
     @pytest.mark.simulated_auth
     @pytest.mark.asyncio
     async def test_cis2_exchanged_token_no_role_provided(
             self,
             get_token_cis2_token_exchange
-        ):
+    ):
         token = get_token_cis2_token_exchange["access_token"]
         headers = {
                 "Authorization": f"Bearer {token}",
