@@ -102,15 +102,71 @@ class TestEndpoints:
 
     @pytest.mark.mock_auth
     @pytest.mark.asyncio
+    @pytest.mark.parametrize("additional_headers,error_description", [
+        (
+            {},
+            "selected_roleid is missing in your token"
+        ),
+        (
+            {"NHSD-Session-URID": "656014452101"},
+            "unable to retrieve user info"
+        )
+    ])
     async def test_nhs_login_exchanged_token_no_role_provided(
-            self, get_token_nhs_login_token_exchange
+            self,
+            get_token_nhs_login_token_exchange,
+            additional_headers,
+            error_description
     ):
         token = get_token_nhs_login_token_exchange["access_token"]
+        headers = {
+                "Authorization": f"Bearer {token}",
+        }
+        for key, value in additional_headers.items():
+            headers[key] = value
 
         response = requests.get(
             url=f"https://internal-dev.api.service.nhs.uk/{config.SERVICE_BASE_PATH}/user-role-service",
-            headers={"Authorization": f"Bearer {token}"},
+            headers=headers
         )
 
         assert response.status_code == 400
-        assert response.json()["issue"][0]["diagnostics"] == "selected_roleid is missing in your token"
+        assert response.json()["issue"][0]["diagnostics"] == error_description
+
+    @pytest.mark.simulated_auth
+    @pytest.mark.asyncio
+    async def test_cis2_exchanged_token_happy_path(
+            self,
+            get_token_cis2_token_exchange
+    ):
+        token = get_token_cis2_token_exchange["access_token"]
+        headers = {
+                "Authorization": f"Bearer {token}",
+        }
+
+        response = requests.get(
+            url=f"https://internal-dev.api.service.nhs.uk/{config.SERVICE_BASE_PATH}/user-role-service",
+            headers=headers
+        )
+
+        assert response.status_code == 200
+
+    @pytest.mark.simulated_auth
+    @pytest.mark.asyncio
+    async def test_cis2_exchanged_token_no_role_provided(
+            self,
+            get_token_cis2_token_exchange
+    ):
+        token = get_token_cis2_token_exchange["access_token"]
+        headers = {
+                "Authorization": f"Bearer {token}",
+                "NHSD-Session-URID": "656014452101"
+        }
+
+        response = requests.get(
+            url=f"https://internal-dev.api.service.nhs.uk/{config.SERVICE_BASE_PATH}/user-role-service",
+            headers=headers
+        )
+
+        assert response.status_code == 400
+        assert response.json()["issue"][0]["diagnostics"] == "unable to retrieve user info"
