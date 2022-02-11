@@ -135,14 +135,25 @@ class TestEndpoints:
 
     @pytest.mark.simulated_auth
     @pytest.mark.asyncio
-    async def test_cis2_exchanged_token_happy_path(
+    @pytest.mark.parametrize("additional_headers", [
+        (
+            {}
+        ),
+        (
+            {"NHSD-Session-URID": "656014452101"}
+        )
+    ])
+    async def test_cis2_exchanged_token_no_role_provided(
             self,
-            get_token_cis2_token_exchange
+            get_token_cis2_token_exchange,
+            additional_headers
     ):
         token = get_token_cis2_token_exchange["access_token"]
         headers = {
                 "Authorization": f"Bearer {token}",
         }
+        for key, value in additional_headers.items():
+            headers[key] = value
 
         response = requests.get(
             url=f"https://internal-dev.api.service.nhs.uk/{config.SERVICE_BASE_PATH}/user-role-service",
@@ -150,23 +161,3 @@ class TestEndpoints:
         )
 
         assert response.status_code == 200
-
-    @pytest.mark.simulated_auth
-    @pytest.mark.asyncio
-    async def test_cis2_exchanged_token_no_role_provided(
-            self,
-            get_token_cis2_token_exchange
-    ):
-        token = get_token_cis2_token_exchange["access_token"]
-        headers = {
-                "Authorization": f"Bearer {token}",
-                "NHSD-Session-URID": "656014452101"
-        }
-
-        response = requests.get(
-            url=f"https://internal-dev.api.service.nhs.uk/{config.SERVICE_BASE_PATH}/user-role-service",
-            headers=headers
-        )
-
-        assert response.status_code == 400
-        assert response.json()["issue"][0]["diagnostics"] == "unable to retrieve user info"
