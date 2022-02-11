@@ -44,5 +44,5 @@ extends:
     apigee_deployments:
       - environment: internal-dev
       # Comment out the tests before merging to master if the shared flow updates isn't released from infra
-        # post_deploy:
-        #   - template: ./templates/run-integration-tests.yml
+        post_deploy:
+          - template: ./templates/run-integration-tests.yml
