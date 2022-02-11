@@ -3,7 +3,7 @@
     <Flow name="UserRoleService">
       <Request>
         <Step>
-            <Name>FlowCallout.UserRoleServiceTEST</Name>
+            <Name>FlowCallout.UserRoleService</Name>
         </Step>
       </Request>
       <Response>
