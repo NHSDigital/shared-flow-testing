@@ -115,6 +115,9 @@
         "application": {
           "type": "string"
         },
+        "application_name": {
+          "type": "string"
+        },
         "env": {
           "type": "string"
         },
