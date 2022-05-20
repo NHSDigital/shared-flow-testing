@@ -64,6 +64,12 @@ async def test_app_and_product(app, product):
 
     await app.create_new_app()
 
+    identity_service_proxy = "identity-service-mock-internal-dev" if config.OAUTH_PROXY == "oauth2-mock" else "identity-service-internal-dev"
+
+    await product.update_proxies([identity_service_proxy, config.SERVICE_NAME])
+
+    app.oauth = OauthHelper(app.client_id, app.client_secret, app.callback_url)
+
     await product.update_scopes(
         [
             "urn:nhsd:apim:app:level3:shared-flow-testing",
@@ -145,7 +151,8 @@ async def get_token_cis2_token_exchange(test_app_and_product):
         'realm': '/NHSIdentity/Healthcare',
         'exp': int(time()) + 6000,
         'tokenType': 'JWTToken',
-        'iat': int(time()) - 100
+        'iat': int(time()) - 100,
+        'selected_roleid': '555254242105'
     }
 
     with open(config.ID_TOKEN_PRIVATE_KEY_ABSOLUTE_PATH, "r") as f:
@@ -165,6 +172,7 @@ async def get_token_cis2_token_exchange(test_app_and_product):
             "client_assertion": client_assertion_jwt,
         },
     )
+
     assert token_resp["status_code"] == 200
     return token_resp["body"]
 
@@ -188,6 +196,7 @@ async def get_token_nhs_login_token_exchange(test_app_and_product):
         "vot": "P9.Cp.Cd",
         "exp": int(time()) + 600,
         "iat": int(time()) - 10,
+        "nhs_number": "900000000001",
         "vtm": "https://auth.sandpit.signin.nhs.uk/trustmark/auth.sandpit.signin.nhs.uk",
         "jti": "b68ddb28-e440-443d-8725-dfe0da330118",
         "identity_proofing_level": "P9",

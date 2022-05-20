@@ -1,9 +1,11 @@
 steps:
+ - task: UsePythonVersion@0
+   displayName: "Use Python 3.9"
+   inputs:
+    versionSpec: "3.9"
+
  - bash: |
-    pip install virtualenv
-    virtualenv test_env
-    source ./test_env/bin/activate
-    pip install -r requirements.txt
+    poetry install
    workingDirectory: $(Pipeline.Workspace)/s/$(SERVICE_NAME)/$(SERVICE_ARTIFACT_NAME)/tests
    displayName: Setup integration tests
 
@@ -29,11 +31,34 @@ steps:
     export STATUS_ENDPOINT_API_KEY="$(status-endpoint-api-key)"
     export APIGEE_API_TOKEN="$(secret.AccessToken)"
     export OAUTH_PROXY="oauth2"
+    export APP_CLIENT_ID="$(CLIENT_ID)"
     export OAUTH_BASE_URI="https://$(APIGEE_ENVIRONMENT).api.service.nhs.uk"
     export ACCESS_TOKEN_HASH_SECRET="$(ACCESS_TOKEN_SECRET)"
-    ./test_env/bin/pytest --reruns 2 --reruns-delay 1 -v --junitxml=test-report.xml
+
+    poetry run pytest --reruns 2 --reruns-delay 1 -v -m "not mock_auth" --junitxml=test-report.xml
    workingDirectory: $(Pipeline.Workspace)/s/$(SERVICE_NAME)/$(SERVICE_ARTIFACT_NAME)/tests
-   displayName: run smoketests
+   displayName: run simulated auth smoketests
+
+ - bash: |
+    export RELEASE_RELEASEID=$(Build.BuildId)
+    export SOURCE_COMMIT_ID=$(Build.SourceVersion)
+    export APIGEE_ENVIRONMENT="$(ENVIRONMENT)"
+    export SERVICE_BASE_PATH="$(SERVICE_BASE_PATH)"
+    export SERVICE_NAME="$(FULLY_QUALIFIED_SERVICE_NAME)"
+    export STATUS_ENDPOINT_API_KEY="$(status-endpoint-api-key)"
+    export JWT_PRIVATE_KEY_ABSOLUTE_PATH="$(Pipeline.Workspace)/secrets/$(JWT_TESTING_PRIVATE_KEY)"
+    export ID_TOKEN_NHS_LOGIN_PRIVATE_KEY_ABSOLUTE_PATH="$(Pipeline.Workspace)/secrets/$(ID_TOKEN_NHS_LOGIN_PRIVATE_KEY)"
+    export ID_TOKEN_PRIVATE_KEY_ABSOLUTE_PATH="$(Pipeline.Workspace)/secrets/$(ID_TOKEN_TESTING_PRIVATE_KEY)"
+    export STATUS_ENDPOINT_API_KEY="$(status-endpoint-api-key)"
+    export APIGEE_API_TOKEN="$(secret.AccessToken)"
+    export OAUTH_PROXY="oauth2-mock"
+    export APP_CLIENT_ID="$(CLIENT_ID)"
+    export OAUTH_BASE_URI="https://$(APIGEE_ENVIRONMENT).api.service.nhs.uk"
+    export ACCESS_TOKEN_HASH_SECRET="$(ACCESS_TOKEN_SECRET)"
+
+    poetry run pytest --reruns 2 --reruns-delay 1 -v -m "not simulated_auth" --junitxml=test-report.xml
+   workingDirectory: $(Pipeline.Workspace)/s/$(SERVICE_NAME)/$(SERVICE_ARTIFACT_NAME)/tests
+   displayName: run mock auth smoketests
 
  - task: PublishTestResults@2
    displayName: 'Publish smoketest results'
