@@ -116,7 +116,7 @@ class TestSplunkLogging:
         auth_user = auth["user"]
         assert auth_user["user_id"] == "lala"
 
-    @pytest.mark.simulated_auth
+    @pytest.mark.mock_auth
     @pytest.mark.splunk
     @pytest.mark.asyncio
     async def test_splunk_auth_with_nhs_login_token_exchange(self, get_token_nhs_login_token_exchange, debug):
