@@ -100,7 +100,7 @@ class TestEndpoints:
         assert response.status_code == status_code
         assert response.json()["issue"][0]["diagnostics"] == error_description
 
-    @pytest.mark.mock_auth
+    @pytest.mark.simulated_auth
     @pytest.mark.asyncio
     @pytest.mark.parametrize("additional_headers,error_description", [
         (
