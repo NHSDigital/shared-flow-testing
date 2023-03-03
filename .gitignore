@@ -16,5 +16,6 @@ __pycache__/
 .idea/
 .venv/
 .env
+.env*
 
 smoketest-report.xml
