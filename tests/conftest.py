@@ -2,6 +2,7 @@ import pytest
 
 from tests.utils.config import ENV
 
+
 # FIXTURES FOR USE IN SET UP OF pytest_nhsd_apim
 @pytest.fixture(scope="session")
 def nhsd_apim_api_name():
