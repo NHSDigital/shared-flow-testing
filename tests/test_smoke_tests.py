@@ -36,7 +36,15 @@ def test_status(nhsd_apim_proxy_url, status_endpoint_auth_headers):
         f"{nhsd_apim_proxy_url}/_status", headers=status_endpoint_auth_headers
     )
     assert resp.status_code == 200
-    # Make some additional assertions about your status response here!
+    body = resp.json()
+
+    assert body["status"] == "pass"
+    assert sorted(body.keys()) == sorted(
+        ["status", "version", "revision", "releaseId", "commitId", "checks"]
+    )
+    assert body["checks"]["healthcheck"]["status"] == "pass"
+    assert body["checks"]["healthcheck"]["responseCode"] == 200
+    assert body["checks"]["healthcheck"]["outcome"] == "Hello, Guest!"
 
 
 @pytest.mark.smoketest
