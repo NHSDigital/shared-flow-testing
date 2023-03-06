@@ -137,10 +137,10 @@ class TestUserRoles:
                     login_form={"username": "9912003071"},
                     force_new_token=True,
                 ),
-                id="No role in token due to being nhs login",
+                id="NHS Login combined: Role can't be used from token",
             ),
             pytest.param(
-                {"NHSD-Session-URID": "656014452101"},  # CHANGE TO 9912003071???
+                {"NHSD-Session-URID": "9912003071"},
                 "unable to retrieve user info",
                 marks=pytest.mark.nhsd_apim_authorization(
                     access="patient",
@@ -148,11 +148,59 @@ class TestUserRoles:
                     login_form={"username": "9912003071"},
                     force_new_token=True,
                 ),
-                id="Invalid role in header as nhs login",
+                id="NHS Login combined: Can't use header to fetch from userinfo",
+            ),
+            pytest.param(
+                {},
+                "selected_roleid is missing in your token",
+                marks=pytest.mark.nhsd_apim_authorization(
+                    access="patient",
+                    level="P9",
+                    login_form={"username": "9912003071"},
+                    authentication="separate",
+                    force_new_token=True,
+                ),
+                id="NHS Login separate: Role can't be used from token",
+            ),
+            pytest.param(
+                {"NHSD-Session-URID": "9912003071"},
+                "unable to retrieve user info",
+                marks=pytest.mark.nhsd_apim_authorization(
+                    access="patient",
+                    level="P9",
+                    login_form={"username": "9912003071"},
+                    authentication="separate",
+                    force_new_token=True,
+                ),
+                id="NHS Login separate: Can't use header to fetch from userinfo",
+            ),
+            pytest.param(
+                {},
+                "selected_roleid is missing in your token",
+                marks=pytest.mark.nhsd_apim_authorization(
+                    access="healthcare_worker",
+                    level="aal3",
+                    login_form={"username": "656005750104"},
+                    authentication="separate",
+                    force_new_token=True,
+                ),
+                id="CIS2 separate: Role can't be used from token",
+            ),
+            pytest.param(
+                {"NHSD-Session-URID": "656005750104"},
+                "unable to retrieve user info",
+                marks=pytest.mark.nhsd_apim_authorization(
+                    access="healthcare_worker",
+                    level="aal3",
+                    login_form={"username": "656005750104"},
+                    authentication="separate",
+                    force_new_token=True,
+                ),
+                id="CIS2 separate: Can't use header to fetch from userinfo",
             ),
         ],
     )
-    def test_nhs_login_exchanged_token_no_role_provided(
+    def test_error_when_not_cis2_combined_auth(
         self,
         nhsd_apim_proxy_url,
         nhsd_apim_auth_headers,
@@ -166,32 +214,3 @@ class TestUserRoles:
 
         assert resp.status_code == 400
         assert resp.json()["issue"][0]["diagnostics"] == error_description
-
-    # @pytest.mark.simulated_auth
-    # @pytest.mark.asyncio
-    # @pytest.mark.parametrize("additional_headers", [
-    #     (
-    #         {}
-    #     ),
-    #     (
-    #         {"NHSD-Session-URID": "656014452101"}
-    #     )
-    # ])
-    # async def test_cis2_exchanged_token_no_role_provided(
-    #         self,
-    #         get_token_cis2_token_exchange,
-    #         additional_headers
-    # ):
-    #     token = get_token_cis2_token_exchange["access_token"]
-    #     headers = {
-    #             "Authorization": f"Bearer {token}",
-    #     }
-    #     for key, value in additional_headers.items():
-    #         headers[key] = value
-
-    #     response = requests.get(
-    #         url=f"https://internal-dev.api.service.nhs.uk/{config.SERVICE_BASE_PATH}/user-role-service",
-    #         headers=headers
-    #     )
-
-    #     assert response.status_code == 200
