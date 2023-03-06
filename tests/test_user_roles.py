@@ -62,7 +62,7 @@ class TestUserRoles:
                     login_form={"username": "656005750104"},
                     force_new_token=True,
                 ),
-                id="Multiple user roles found in userinfo"
+                id="Multiple user roles found in userinfo",
             ),
             pytest.param(
                 {},
@@ -73,7 +73,7 @@ class TestUserRoles:
                     login_form={"username": "Aal3"},
                     force_new_token=True,
                 ),
-                id="No user role provided by any means"
+                id="No user role provided by any means",
             ),
             pytest.param(
                 {},
@@ -84,7 +84,7 @@ class TestUserRoles:
                     login_form={"username": "Aal4"},
                     force_new_token=True,
                 ),
-                id="User role sent in id token but empty"
+                id="User role sent in id token but empty",
             ),
             pytest.param(
                 {},
@@ -95,7 +95,7 @@ class TestUserRoles:
                     login_form={"username": "Aal5"},
                     force_new_token=True,
                 ),
-                id="nrbac is malformed, or person_roleid is empty (in userinfo)"
+                id="nrbac is malformed, or person_roleid is empty (in userinfo)",
             ),
             pytest.param(
                 {"NHSD-Session-URID": "notAuserRole123"},
@@ -106,7 +106,7 @@ class TestUserRoles:
                     login_form={"username": "656005750104"},
                     force_new_token=True,
                 ),
-                id="Invalid role in header"
+                id="Invalid role in header",
             ),
         ],
     )
@@ -119,52 +119,49 @@ class TestUserRoles:
     ):
         resp = requests.get(
             url=f"{nhsd_apim_proxy_url}/user-role-service",
-            headers={
-                **nhsd_apim_auth_headers,
-                **additional_headers
-            }
+            headers={**nhsd_apim_auth_headers, **additional_headers},
         )
 
         assert resp.status_code == 400
         assert resp.json()["issue"][0]["diagnostics"] == error_description
 
-    @pytest.mark.parametrize("additional_headers,error_description", [
-        pytest.param(
-            {},
-            "selected_roleid is missing in your token",
-            marks=pytest.mark.nhsd_apim_authorization(
-                access="patient",
-                level="P9",
-                login_form={"username": "9912003071"},
-                force_new_token=True,
+    @pytest.mark.parametrize(
+        "additional_headers,error_description",
+        [
+            pytest.param(
+                {},
+                "selected_roleid is missing in your token",
+                marks=pytest.mark.nhsd_apim_authorization(
+                    access="patient",
+                    level="P9",
+                    login_form={"username": "9912003071"},
+                    force_new_token=True,
+                ),
+                id="No role in token due to being nhs login",
             ),
-            id="No role in token due to being nhs login"
-        ),
-        pytest.param(
-            {"NHSD-Session-URID": "656014452101"}, # CHANGE TO 9912003071???
-            "unable to retrieve user info",
-            marks=pytest.mark.nhsd_apim_authorization(
-                access="patient",
-                level="P9",
-                login_form={"username": "9912003071"},
-                force_new_token=True,
+            pytest.param(
+                {"NHSD-Session-URID": "656014452101"},  # CHANGE TO 9912003071???
+                "unable to retrieve user info",
+                marks=pytest.mark.nhsd_apim_authorization(
+                    access="patient",
+                    level="P9",
+                    login_form={"username": "9912003071"},
+                    force_new_token=True,
+                ),
+                id="Invalid role in header as nhs login",
             ),
-            id="Invalid role in header as nhs login"
-        )
-    ])
+        ],
+    )
     def test_nhs_login_exchanged_token_no_role_provided(
-            self,
-            nhsd_apim_proxy_url,
-            nhsd_apim_auth_headers,
-            additional_headers,
-            error_description
+        self,
+        nhsd_apim_proxy_url,
+        nhsd_apim_auth_headers,
+        additional_headers,
+        error_description,
     ):
         resp = requests.get(
             url=f"{nhsd_apim_proxy_url}/user-role-service",
-            headers={
-                **nhsd_apim_auth_headers,
-                **additional_headers
-            }
+            headers={**nhsd_apim_auth_headers, **additional_headers},
         )
 
         assert resp.status_code == 400
