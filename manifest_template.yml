@@ -32,7 +32,7 @@ apigee:
         proxies:
           - {{ SERVICE_NAME }}-{{ ENV.name }}
           - identity-service-{{ ENV.name }}
-          - identity-service-{{ ENV.name }}-mock
+          - identity-service-mock-{{ ENV.name }}
         scopes:
           - 'urn:nhsd:apim:app:level3:{{ SERVICE_NAME }}'
           - 'urn:nhsd:apim:user-nhs-cis2:aal3:{{ SERVICE_NAME }}'
