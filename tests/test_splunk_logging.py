@@ -1,16 +1,20 @@
-# import base64
-# import hashlib
-# import hmac
-# import json
+import base64
+import hashlib
+import hmac
+import json
+import pytest
+import requests
 
-# import pytest
-# import requests
 # from jsonschema import validate
+from uuid import uuid4
 
 # from .utils.config import SERVICE_BASE_PATH, ENVIRONMENT, ACCESS_TOKEN_HASH_SECRET, APP_CLIENT_ID
+from tests.utils.config import ENV
+from tests.utils.helpers import get_variable_from_trace
 
 
-# class TestSplunkLogging:
+class TestSplunkLogging:
+    """Test attributes are logged to splunk"""
 #     oauth_protected_url = f"https://{ENVIRONMENT}.api.service.nhs.uk/{SERVICE_BASE_PATH}/splunk-test"
 #     apikey_protected_url = f"https://{ENVIRONMENT}.api.service.nhs.uk/{SERVICE_BASE_PATH}/apikey-protected"
 #     open_access_url = f"https://{ENVIRONMENT}.api.service.nhs.uk/{SERVICE_BASE_PATH}/open-access"
@@ -21,42 +25,45 @@
 #         splunk_content_json = await debug.get_apigee_variable_from_trace(name='splunkCalloutRequest.content')
 #         return json.loads(splunk_content_json)
 
-#     @staticmethod
-#     def _calculate_hmac_sha512(content: str) -> str:
-#         binary_content = bytes(content, "utf-8")
-#         hmac_key = bytes(ACCESS_TOKEN_HASH_SECRET, "utf-8")
-#         signature = hmac.new(hmac_key, binary_content, hashlib.sha512)
+    @staticmethod
+    def _calculate_hmac_sha512(content: str) -> str:
+        binary_content = bytes(content, "utf-8")
+        hmac_key = bytes(ENV["access_token_hash_secret"], "utf-8")
+        signature = hmac.new(hmac_key, binary_content, hashlib.sha512)
 
-#         return base64.b64encode(signature.digest()).decode("utf-8")
+        return base64.b64encode(signature.digest()).decode("utf-8")
 
-#     @pytest.mark.simulated_auth
-#     @pytest.mark.splunk
-#     @pytest.mark.asyncio
-#     async def test_splunk_auth_with_client_credentials(self, get_token_client_credentials, debug):
-#         # Given
-#         token = get_token_client_credentials["access_token"]
-#         expected_hashed_token = self._calculate_hmac_sha512(token)
+    @pytest.mark.nhsd_apim_authorization(access="application", level="level3")
+    def test_splunk_auth_with_client_credentials(
+        self, _nhsd_apim_auth_token_data, nhsd_apim_proxy_url, trace
+    ):
+        access_token = _nhsd_apim_auth_token_data["access_token"]
+        expected_hashed_token = self._calculate_hmac_sha512(access_token)
 
-#         # When
-#         await debug.start_trace()
-#         requests.get(
-#             url=self.oauth_protected_url,
-#             headers={"Authorization": f"Bearer {token}"},
-#         )
-#         payload = await self._get_payload_from_splunk(debug)
+        session_name = str(uuid4())
+        header_filters = {"trace_id": session_name}
+        trace.post_debugsession(session=session_name, header_filters=header_filters)
 
-#         # Then
-#         auth = payload["auth"]
-#         assert auth["access_token_hash"] == expected_hashed_token
+        proxy_resp = requests.get(
+            url=f"{nhsd_apim_proxy_url}/splunk-test",
+            headers={"Authorization": f"Bearer {access_token}", **header_filters},
+        )
 
-#         auth_meta = auth["meta"]
-#         assert auth_meta["auth_type"] == "app"
-#         assert auth_meta["grant_type"] == "client_credentials"
-#         assert auth_meta["level"] == "level3"
-#         assert auth_meta["provider"] == "apim"
+        payload = json.loads(get_variable_from_trace(trace, session_name, "splunkCalloutRequest.content"))
 
-#         auth_user = auth["user"]
-#         assert auth_user["user_id"] == ""
+        trace.delete_debugsession_by_name(session_name)
+
+        auth = payload["auth"]
+        assert auth["access_token_hash"] == expected_hashed_token
+
+        auth_meta = auth["meta"]
+        assert auth_meta["auth_type"] == "app"
+        assert auth_meta["grant_type"] == "client_credentials"
+        assert auth_meta["level"] == "level3"
+        assert auth_meta["provider"] == "apim"
+
+        auth_user = auth["user"]
+        assert auth_user["user_id"] == ""
 
 #     @pytest.mark.simulated_auth
 #     @pytest.mark.splunk
