@@ -57,14 +57,8 @@ class TestExtendedAttributes:
                     "value": '{"attr_a": "value_a", "attr_b": "value_b"}',
                 },
                 [
-                    {
-                        "name": "apim-app-flow-vars.attr_a",
-                        "value": "value_a"
-                    },
-                    {
-                        "name": "apim-app-flow-vars.attr_b",
-                        "value": "value_b"
-                    }
+                    {"name": "apim-app-flow-vars.attr_a", "value": "value_a"},
+                    {"name": "apim-app-flow-vars.attr_b", "value": "value_b"},
                 ],
                 id="Multiple attributes",
             ),
@@ -80,7 +74,7 @@ class TestExtendedAttributes:
         nhsd_apim_config,
         trace,
         new_attribute,
-        flow_vars_to_check
+        flow_vars_to_check,
     ):
         # Update test app with proxy product and the extended attribute
         app = _create_function_scoped_test_app
@@ -113,8 +107,8 @@ class TestExtendedAttributes:
 
         for flow_var in flow_vars_to_check:
             assert flow_var["value"] == get_variable_from_trace(
-            trace, session_name, flow_var["name"]
-        )
+                trace, session_name, flow_var["name"]
+            )
 
         trace.delete_debugsession_by_name(session_name)
 
