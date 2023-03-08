@@ -2,233 +2,170 @@ import base64
 import hashlib
 import hmac
 import json
-
 import pytest
 import requests
-from jsonschema import validate
 
-from .configuration.config import SERVICE_BASE_PATH, ENVIRONMENT, ACCESS_TOKEN_HASH_SECRET, APP_CLIENT_ID
+from jsonschema import validate
+from uuid import uuid4
+
+from tests.utils.config import ENV
+from tests.utils.helpers import get_variable_from_trace
 
 
 class TestSplunkLogging:
-    oauth_protected_url = f"https://{ENVIRONMENT}.api.service.nhs.uk/{SERVICE_BASE_PATH}/splunk-test"
-    apikey_protected_url = f"https://{ENVIRONMENT}.api.service.nhs.uk/{SERVICE_BASE_PATH}/apikey-protected"
-    open_access_url = f"https://{ENVIRONMENT}.api.service.nhs.uk/{SERVICE_BASE_PATH}/open-access"
-    ping_url = f"https://{ENVIRONMENT}.api.service.nhs.uk/{SERVICE_BASE_PATH}/_ping"
-
-    @staticmethod
-    async def _get_payload_from_splunk(debug):
-        splunk_content_json = await debug.get_apigee_variable_from_trace(name='splunkCalloutRequest.content')
-        return json.loads(splunk_content_json)
+    """Test attributes are logged to splunk"""
 
     @staticmethod
     def _calculate_hmac_sha512(content: str) -> str:
         binary_content = bytes(content, "utf-8")
-        hmac_key = bytes(ACCESS_TOKEN_HASH_SECRET, "utf-8")
+        hmac_key = bytes(ENV["access_token_hash_secret"], "utf-8")
         signature = hmac.new(hmac_key, binary_content, hashlib.sha512)
 
         return base64.b64encode(signature.digest()).decode("utf-8")
 
-    @pytest.mark.simulated_auth
-    @pytest.mark.splunk
-    @pytest.mark.asyncio
-    async def test_splunk_auth_with_client_credentials(self, get_token_client_credentials, debug):
-        # Given
-        token = get_token_client_credentials["access_token"]
-        expected_hashed_token = self._calculate_hmac_sha512(token)
+    @pytest.mark.parametrize(
+        "expected_attr",
+        [
+            pytest.param(
+                {
+                    "auth_type": "app",
+                    "grant_type": "client_credentials",
+                    "level": "level3",
+                    "provider": "apim",
+                    "user_id": "",
+                },
+                marks=pytest.mark.nhsd_apim_authorization(
+                    access="application", level="level3", force_new_token=True
+                ),
+                id="Client credentials",
+            ),
+            pytest.param(
+                {
+                    "auth_type": "user",
+                    "grant_type": "authorization_code",
+                    "level": "aal3",
+                    "provider": "apim-mock-nhs-cis2",
+                    "user_id": "656005750104",
+                },
+                marks=pytest.mark.nhsd_apim_authorization(
+                    access="healthcare_worker",
+                    level="aal3",
+                    login_form={"username": "656005750104"},
+                    force_new_token=True,
+                ),
+                id="Authorization Code: CIS2",
+            ),
+            pytest.param(
+                {
+                    "auth_type": "user",
+                    "grant_type": "authorization_code",
+                    "level": "p9",
+                    "provider": "apim-mock-nhs-login",
+                    "user_id": "9912003071",
+                },
+                marks=pytest.mark.nhsd_apim_authorization(
+                    access="patient",
+                    level="P9",
+                    login_form={"username": "9912003071"},
+                    force_new_token=True,
+                ),
+                id="Authorization Code: NHS Login",
+            ),
+            pytest.param(
+                {
+                    "auth_type": "user",
+                    "grant_type": "token_exchange",
+                    "level": "aal3",
+                    "provider": "apim-mock-nhs-cis2",
+                    "user_id": "656005750104",
+                },
+                marks=pytest.mark.nhsd_apim_authorization(
+                    access="healthcare_worker",
+                    level="aal3",
+                    login_form={"username": "656005750104"},
+                    authentication="separate",
+                    force_new_token=True,
+                ),
+                id="Token exchange: CIS2",
+            ),
+            pytest.param(
+                {
+                    "auth_type": "user",
+                    "grant_type": "token_exchange",
+                    "level": "p9",
+                    "provider": "apim-mock-nhs-login",
+                    "user_id": "9912003071",
+                },
+                marks=pytest.mark.nhsd_apim_authorization(
+                    access="patient",
+                    level="P9",
+                    login_form={"username": "9912003071"},
+                    authentication="separate",
+                    force_new_token=True,
+                ),
+                id="Token exchange: NHS Login",
+            ),
+        ],
+    )
+    def test_splunk_auth_attributes(
+        self, _nhsd_apim_auth_token_data, nhsd_apim_proxy_url, trace, expected_attr
+    ):
+        access_token = _nhsd_apim_auth_token_data["access_token"]
+        expected_hashed_token = self._calculate_hmac_sha512(access_token)
 
-        # When
-        await debug.start_trace()
+        session_name = str(uuid4())
+        header_filters = {"trace_id": session_name}
+        trace.post_debugsession(session=session_name, header_filters=header_filters)
+
         requests.get(
-            url=self.oauth_protected_url,
-            headers={"Authorization": f"Bearer {token}"},
+            url=f"{nhsd_apim_proxy_url}/splunk-test",
+            headers={"Authorization": f"Bearer {access_token}", **header_filters},
         )
-        payload = await self._get_payload_from_splunk(debug)
 
-        # Then
+        payload = json.loads(
+            get_variable_from_trace(trace, session_name, "splunkCalloutRequest.content")
+        )
+
+        trace.delete_debugsession_by_name(session_name)
+
         auth = payload["auth"]
         assert auth["access_token_hash"] == expected_hashed_token
 
         auth_meta = auth["meta"]
-        assert auth_meta["auth_type"] == "app"
-        assert auth_meta["grant_type"] == "client_credentials"
-        assert auth_meta["level"] == "level3"
-        assert auth_meta["provider"] == "apim"
+        assert auth_meta["auth_type"] == expected_attr["auth_type"]
+        assert auth_meta["grant_type"] == expected_attr["grant_type"]
+        assert auth_meta["level"] == expected_attr["level"]
+        assert auth_meta["provider"] == expected_attr["provider"]
 
         auth_user = auth["user"]
-        assert auth_user["user_id"] == ""
+        assert auth_user["user_id"] == expected_attr["user_id"]
 
-    @pytest.mark.simulated_auth
-    @pytest.mark.splunk
-    @pytest.mark.asyncio
-    async def test_splunk_auth_with_authorization_code(self, get_token, debug):
-        # Given
-        token = get_token["access_token"]
-        expected_hashed_token = self._calculate_hmac_sha512(token)
+    @pytest.mark.nhsd_apim_authorization(
+        access="application", level="level0", force_new_token=True
+    )
+    def test_splunk_auth_attributes_api_key(
+        self,
+        _nhsd_apim_auth_token_data,
+        nhsd_apim_proxy_url,
+        trace,
+    ):
+        api_key = _nhsd_apim_auth_token_data["apikey"]
 
-        # When
-        await debug.start_trace()
+        session_name = str(uuid4())
+        header_filters = {"trace_id": session_name}
+        trace.post_debugsession(session=session_name, header_filters=header_filters)
+
         requests.get(
-            url=self.oauth_protected_url,
-            headers={"Authorization": f"Bearer {token}"},
+            url=f"{nhsd_apim_proxy_url}/apikey-protected",
+            headers={"apikey": api_key, **header_filters},
         )
-        payload = await self._get_payload_from_splunk(debug)
 
-        # Then
-        auth = payload["auth"]
-        assert auth["access_token_hash"] == expected_hashed_token
-
-        auth_meta = auth["meta"]
-        assert auth_meta["auth_type"] == "user"
-        assert auth_meta["grant_type"] == "authorization_code"
-        assert auth_meta["level"] == "aal3"
-        assert auth_meta["provider"] == "nhs-cis2"
-
-        auth_user = auth["user"]
-        assert auth_user["user_id"] == "787807429511"
-
-    @pytest.mark.simulated_auth
-    @pytest.mark.splunk
-    @pytest.mark.asyncio
-    async def test_splunk_auth_with_cis2_token_exchange(self, get_token_cis2_token_exchange, debug):
-        # Given
-        token = get_token_cis2_token_exchange["access_token"]
-        expected_hashed_token = self._calculate_hmac_sha512(token)
-
-        # When
-        await debug.start_trace()
-        requests.get(
-            url=self.oauth_protected_url,
-            headers={"Authorization": f"Bearer {token}"},
+        payload = json.loads(
+            get_variable_from_trace(trace, session_name, "splunkCalloutRequest.content")
         )
-        payload = await self._get_payload_from_splunk(debug)
 
-        # Then
-        auth = payload["auth"]
-        assert auth["access_token_hash"] == expected_hashed_token
+        trace.delete_debugsession_by_name(session_name)
 
-        auth_meta = auth["meta"]
-        assert auth_meta["auth_type"] == "user"
-        assert auth_meta["grant_type"] == "token_exchange"
-        assert auth_meta["level"] == "aal3"
-        assert auth_meta["provider"] == "nhs-cis2"
-
-        auth_user = auth["user"]
-        assert auth_user["user_id"] == "lala"
-
-    @pytest.mark.simulated_auth
-    @pytest.mark.splunk
-    @pytest.mark.asyncio
-    async def test_splunk_auth_with_nhs_login_token_exchange(self, get_token_nhs_login_token_exchange, debug):
-        # Given
-        token = get_token_nhs_login_token_exchange["access_token"]
-        expected_hashed_token = self._calculate_hmac_sha512(token)
-
-        # When
-        await debug.start_trace()
-        requests.get(
-            url=self.oauth_protected_url,
-            headers={"Authorization": f"Bearer {token}"},
-        )
-        payload = await self._get_payload_from_splunk(debug)
-
-        # Then
-        auth = payload["auth"]
-        assert auth["access_token_hash"] == expected_hashed_token
-
-        auth_meta = auth["meta"]
-        assert auth_meta["auth_type"] == "user"
-        assert auth_meta["grant_type"] == "token_exchange"
-        assert auth_meta["level"] == "p9"
-        assert auth_meta["provider"] == "apim-mock-nhs-login"
-
-        auth_user = auth["user"]
-        assert auth_user["user_id"] == "900000000001"
-
-    @pytest.mark.simulated_auth
-    @pytest.mark.splunk
-    @pytest.mark.asyncio
-    async def test_splunk_auth_with_invalid_token(self, debug):
-        # Given
-        token = "invalid token"
-        expected_hashed_token = "empty"
-
-        # When
-        await debug.start_trace()
-        requests.get(
-            url=self.oauth_protected_url,
-            headers={"Authorization": f"Bearer {token}"},
-        )
-        payload = await self._get_payload_from_splunk(debug)
-
-        # Then
-        auth = payload["auth"]
-        assert auth["access_token_hash"] == expected_hashed_token
-
-        auth_meta = auth["meta"]
-        assert auth_meta["auth_type"] == "unknown"
-        assert auth_meta["grant_type"] == ""
-        assert auth_meta["level"] == "-"
-        assert auth_meta["provider"] == "apim"
-
-        auth_user = auth["user"]
-        assert auth_user["user_id"] == ""
-
-        meta = payload["meta"]
-        assert meta["client_id"] == "empty"
-        assert meta["application"] == "unknown"
-        assert meta["product"] == ""
-
-    @pytest.mark.simulated_auth
-    @pytest.mark.splunk
-    @pytest.mark.asyncio
-    async def test_splunk_auth_with_expired_token(self, debug):
-        # Given
-        token = "zRygtc34R2pwxbiUktLsMJWX0iJW"
-        expected_hashed_token = "empty"
-
-        # When
-        await debug.start_trace()
-        requests.get(
-            url=self.oauth_protected_url,
-            headers={"Authorization": f"Bearer {token}"},
-        )
-        payload = await self._get_payload_from_splunk(debug)
-
-        # Then
-        auth = payload["auth"]
-        assert auth["access_token_hash"] == expected_hashed_token
-
-        auth_meta = auth["meta"]
-        assert auth_meta["auth_type"] == "unknown"
-        assert auth_meta["grant_type"] == ""
-        assert auth_meta["level"] == "-"
-        assert auth_meta["provider"] == "apim"
-
-        auth_user = auth["user"]
-        assert auth_user["user_id"] == ""
-
-        meta = payload["meta"]
-        assert meta["client_id"] == "empty"
-        assert meta["application"] == "unknown"
-        assert meta["product"] == ""
-
-    @pytest.mark.simulated_auth
-    @pytest.mark.splunk
-    @pytest.mark.asyncio
-    async def test_splunk_auth_with_apikey(self, debug):
-        # Given
-        apikey = APP_CLIENT_ID
-
-        # When
-        await debug.start_trace()
-        requests.get(
-            url=self.apikey_protected_url,
-            headers={"apikey": apikey},
-        )
-        payload = await self._get_payload_from_splunk(debug)
-
-        # Then
         auth = payload["auth"]
         assert auth["access_token_hash"] == ""
 
@@ -242,24 +179,30 @@ class TestSplunkLogging:
         assert auth_user["user_id"] == ""
 
         meta = payload["meta"]
-        assert meta["client_id"] == apikey
+        assert meta["client_id"] == api_key
 
-    @pytest.mark.simulated_auth
-    @pytest.mark.splunk
-    @pytest.mark.asyncio
-    async def test_splunk_auth_with_invalid_apikey(self, debug):
-        # Given
-        apikey = "invalid api key"
+    def test_splunk_auth_attributes_invalid_api_key(
+        self,
+        nhsd_apim_proxy_url,
+        trace,
+    ):
+        api_key = "invalid api key"
 
-        # When
-        await debug.start_trace()
+        session_name = str(uuid4())
+        header_filters = {"trace_id": session_name}
+        trace.post_debugsession(session=session_name, header_filters=header_filters)
+
         requests.get(
-            url=self.apikey_protected_url,
-            headers={"apikey": apikey},
+            url=f"{nhsd_apim_proxy_url}/apikey-protected",
+            headers={"apikey": api_key, **header_filters},
         )
-        payload = await self._get_payload_from_splunk(debug)
 
-        # Then
+        payload = json.loads(
+            get_variable_from_trace(trace, session_name, "splunkCalloutRequest.content")
+        )
+
+        trace.delete_debugsession_by_name(session_name)
+
         auth = payload["auth"]
         assert auth["access_token_hash"] == ""
 
@@ -277,18 +220,23 @@ class TestSplunkLogging:
         assert meta["application"] == "unknown"
         assert meta["product"] == ""
 
-    @pytest.mark.simulated_auth
-    @pytest.mark.splunk
-    @pytest.mark.asyncio
-    async def test_splunk_auth_open_access(self, debug):
-        # When
-        await debug.start_trace()
-        requests.get(
-            url=self.open_access_url,
-        )
-        payload = await self._get_payload_from_splunk(debug)
+    @pytest.mark.parametrize("endpoint", ["/open-access", "/_ping"])
+    def test_splunk_attributes_open_access(self, nhsd_apim_proxy_url, trace, endpoint):
+        session_name = str(uuid4())
+        header_filters = {"trace_id": session_name}
+        trace.post_debugsession(session=session_name, header_filters=header_filters)
 
-        # Then
+        requests.get(
+            url=nhsd_apim_proxy_url + endpoint,
+            headers=header_filters,
+        )
+
+        payload = json.loads(
+            get_variable_from_trace(trace, session_name, "splunkCalloutRequest.content")
+        )
+
+        trace.delete_debugsession_by_name(session_name)
+
         auth = payload["auth"]
         assert auth["access_token_hash"] == ""
 
@@ -305,26 +253,40 @@ class TestSplunkLogging:
         assert meta["client_id"] == "empty"
         assert meta["application"] == "unknown"
 
-    @pytest.mark.simulated_auth
-    @pytest.mark.splunk
-    @pytest.mark.asyncio
-    async def test_splunk_auth_open_access_ping(self, debug):
-        # There is nothing especial about /_ping itself. It's an endpoint that doesn't have a target backend
-        # When
-        await debug.start_trace()
-        requests.get(
-            url=self.ping_url,
-        )
-        payload = await self._get_payload_from_splunk(debug)
+    @pytest.mark.parametrize(
+        "access_token",
+        [
+            pytest.param("invalid token", id="Invalid token"),
+            pytest.param("zRygtc34R2pwxbiUktLsMJWX0iJW", id="Expired token"),
+        ],
+    )
+    def test_splunk_auth_attributes_invalid_token(
+        self, access_token, nhsd_apim_proxy_url, trace
+    ):
+        expected_hashed_token = "empty"
 
-        # Then
+        session_name = str(uuid4())
+        header_filters = {"trace_id": session_name}
+        trace.post_debugsession(session=session_name, header_filters=header_filters)
+
+        requests.get(
+            url=f"{nhsd_apim_proxy_url}/splunk-test",
+            headers={"Authorization": f"Bearer {access_token}", **header_filters},
+        )
+
+        payload = json.loads(
+            get_variable_from_trace(trace, session_name, "splunkCalloutRequest.content")
+        )
+
+        trace.delete_debugsession_by_name(session_name)
+
         auth = payload["auth"]
-        assert auth["access_token_hash"] == ""
+        assert auth["access_token_hash"] == expected_hashed_token
 
         auth_meta = auth["meta"]
-        assert auth_meta["auth_type"] == "app"
+        assert auth_meta["auth_type"] == "unknown"
         assert auth_meta["grant_type"] == ""
-        assert auth_meta["level"] == "open"
+        assert auth_meta["level"] == "-"
         assert auth_meta["provider"] == "apim"
 
         auth_user = auth["user"]
@@ -333,40 +295,63 @@ class TestSplunkLogging:
         meta = payload["meta"]
         assert meta["client_id"] == "empty"
         assert meta["application"] == "unknown"
+        assert meta["product"] == ""
 
-    @pytest.mark.simulated_auth
-    @pytest.mark.splunk
-    @pytest.mark.asyncio
-    async def test_splunk_payload_schema(self, get_token, debug):
-        # Given
-        token = get_token["access_token"]
+    @pytest.mark.nhsd_apim_authorization(
+        access="healthcare_worker",
+        level="aal3",
+        login_form={"username": "656005750104"},
+        force_new_token=True,
+    )
+    def test_splunk_payload_schema(
+        self,
+        nhsd_apim_auth_headers,
+        nhsd_apim_proxy_url,
+        trace,
+    ):
+        session_name = str(uuid4())
+        header_filters = {"trace_id": session_name}
+        trace.post_debugsession(session=session_name, header_filters=header_filters)
 
-        # When
-        await debug.start_trace()
         requests.get(
-            url=self.oauth_protected_url,
-            headers={"Authorization": f"Bearer {token}"},
+            url=f"{nhsd_apim_proxy_url}/splunk-test",
+            headers={**nhsd_apim_auth_headers, **header_filters},
         )
-        payload = await self._get_payload_from_splunk(debug)
 
-        with open('splunk_logging_schema.json') as f:
+        payload = json.loads(
+            get_variable_from_trace(trace, session_name, "splunkCalloutRequest.content")
+        )
+
+        trace.delete_debugsession_by_name(session_name)
+
+        with open("tests/utils/splunk_logging_schema.json") as f:
             schema = json.load(f)
 
         # If no exception is raised by validate(), the instance is valid.
         validate(instance=payload, schema=schema)
 
-    @pytest.mark.simulated_auth
-    @pytest.mark.splunk
-    @pytest.mark.asyncio
-    async def test_splunk_payload_schema_open_access(self, debug):
-        # When hitting an open-access endpoint
-        await debug.start_trace()
-        requests.get(url=self.open_access_url)
-        payload = await self._get_payload_from_splunk(debug)
+    def test_splunk_payload_schema_open_access(
+        self,
+        nhsd_apim_proxy_url,
+        trace,
+    ):
+        session_name = str(uuid4())
+        header_filters = {"trace_id": session_name}
+        trace.post_debugsession(session=session_name, header_filters=header_filters)
 
-        with open('splunk_logging_schema.json') as f:
+        requests.get(
+            url=f"{nhsd_apim_proxy_url}/open-access",
+            headers=header_filters,
+        )
+
+        payload = json.loads(
+            get_variable_from_trace(trace, session_name, "splunkCalloutRequest.content")
+        )
+
+        trace.delete_debugsession_by_name(session_name)
+
+        with open("tests/utils/splunk_logging_schema.json") as f:
             schema = json.load(f)
 
-        # Then
         # If no exception is raised by validate(), the instance is valid.
         validate(instance=payload, schema=schema)
