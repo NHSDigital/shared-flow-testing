@@ -32,17 +32,10 @@ extends:
     service_name: ${{ variables.service_name }}
     short_service_name: ${{ variables.short_service_name }}
     service_base_path: ${{ variables.service_base_path }}
-    secret_file_ids:
-      - ptl/app-credentials/jwt_testing/non-prod/JWT_TESTING_PRIVATE_KEY
-      - ptl/app-credentials/jwt_testing/non-prod/ID_TOKEN_TESTING_PRIVATE_KEY
-      - ptl/app-credentials/jwt_testing/non-prod/ID_TOKEN_NHS_LOGIN_PRIVATE_KEY
     secret_ids:
-      - ptl/monitoring/status-endpoint-api-key
       - ptl/app-credentials/identity-service/non-prod/ACCESS_TOKEN_SECRET
-    config_ids:
-      - /ptl/azure-devops/env-internal-dev/test-app/internal-testing-internal-dev/CLIENT_ID
     apigee_deployments:
       - environment: internal-dev
-      # Comment out the tests before merging to master if the shared flow updates isn't released from infra
+      # Comment out the tests before merging to master if the shared flow updates needed aren't released from infra
         post_deploy:
           - template: ./templates/run-integration-tests.yml

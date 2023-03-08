@@ -12,7 +12,8 @@ from tests.utils.helpers import get_variable_from_trace
 class TestExtendedAttributes:
     """Test extended attributes are available"""
 
-    def get_token_client_credentials(self, client_id, private_key):
+    @staticmethod
+    def _get_token_client_credentials(client_id, private_key):
         claims = {
             "sub": client_id,
             "iss": client_id,
@@ -89,7 +90,7 @@ class TestExtendedAttributes:
         header_filters = {"trace_id": session_name}
         trace.post_debugsession(session=session_name, header_filters=header_filters)
 
-        access_token = self.get_token_client_credentials(
+        access_token = self._get_token_client_credentials(
             client_id=app["credentials"][0]["consumerKey"],
             private_key=_jwt_keys["private_key_pem"],
         )
@@ -167,7 +168,7 @@ class TestExtendedAttributes:
         header_filters = {"trace_id": session_name}
         trace.post_debugsession(session=session_name, header_filters=header_filters)
 
-        access_token = self.get_token_client_credentials(
+        access_token = self._get_token_client_credentials(
             client_id=app["credentials"][0]["consumerKey"],
             private_key=_jwt_keys["private_key_pem"],
         )

@@ -7,12 +7,12 @@ class TestHealthEndpoints:
     """Test ping and status endpoints to check health"""
 
     @pytest.mark.smoketest
-    def test_ping(nhsd_apim_proxy_url):
+    def test_ping(self, nhsd_apim_proxy_url):
         resp = requests.get(f"{nhsd_apim_proxy_url}/_ping")
         assert resp.status_code == 200
 
     @pytest.mark.smoketest
-    def test_wait_for_ping(nhsd_apim_proxy_url):
+    def test_wait_for_ping(self, nhsd_apim_proxy_url):
         retries = 0
         resp = requests.get(f"{nhsd_apim_proxy_url}/_ping")
         deployed_commitId = resp.json().get("commitId")
@@ -34,7 +34,7 @@ class TestHealthEndpoints:
         assert deployed_commitId == ENV["source_commit_id"]
 
     @pytest.mark.smoketest
-    def test_status(nhsd_apim_proxy_url, status_endpoint_auth_headers):
+    def test_status(self, nhsd_apim_proxy_url, status_endpoint_auth_headers):
         resp = requests.get(
             f"{nhsd_apim_proxy_url}/_status", headers=status_endpoint_auth_headers
         )
@@ -50,7 +50,7 @@ class TestHealthEndpoints:
         assert body["checks"]["healthcheck"]["outcome"] == "Hello, Guest!"
 
     @pytest.mark.smoketest
-    def test_wait_for_status(nhsd_apim_proxy_url, status_endpoint_auth_headers):
+    def test_wait_for_status(self, nhsd_apim_proxy_url, status_endpoint_auth_headers):
         retries = 0
         resp = requests.get(
             f"{nhsd_apim_proxy_url}/_status", headers=status_endpoint_auth_headers

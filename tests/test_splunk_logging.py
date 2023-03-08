@@ -298,7 +298,10 @@ class TestSplunkLogging:
         assert meta["product"] == ""
 
     @pytest.mark.nhsd_apim_authorization(
-        access="application", level="level0", force_new_token=True
+        access="healthcare_worker",
+        level="aal3",
+        login_form={"username": "656005750104"},
+        force_new_token=True,
     )
     def test_splunk_payload_schema(
         self,
@@ -321,7 +324,7 @@ class TestSplunkLogging:
 
         trace.delete_debugsession_by_name(session_name)
 
-        with open("tests/splunk_logging_schema.json") as f:
+        with open("tests/utils/splunk_logging_schema.json") as f:
             schema = json.load(f)
 
         # If no exception is raised by validate(), the instance is valid.
@@ -347,7 +350,7 @@ class TestSplunkLogging:
 
         trace.delete_debugsession_by_name(session_name)
 
-        with open("tests/splunk_logging_schema.json") as f:
+        with open("tests/utils/splunk_logging_schema.json") as f:
             schema = json.load(f)
 
         # If no exception is raised by validate(), the instance is valid.
