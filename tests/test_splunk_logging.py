@@ -403,6 +403,10 @@ class TestSplunkLogging:
                         "header_name": "Content-Encoding",
                         "splunk_key": "content_encoding",
                     },
+                    {
+                        "header_name": "Content-Length",
+                        "splunk_key": "content_length",
+                    },
                     {"header_name": "X-Request-ID", "splunk_key": "requestID"},
                     {"header_name": "X-Correlation-ID", "splunk_key": "correlationID"},
                     {"header_name": "Host", "splunk_key": "host"},
@@ -416,6 +420,10 @@ class TestSplunkLogging:
                     {
                         "header_name": "Content-Encoding",
                         "splunk_key": "content_encoding",
+                    },
+                    {
+                        "header_name": "Content-Length",
+                        "splunk_key": "content_length",
                     },
                 ],
             ),
