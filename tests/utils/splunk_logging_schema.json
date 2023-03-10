@@ -43,6 +43,9 @@
     "request": {
       "type": "object",
       "properties": {
+        "headers": {
+          "type": "string"
+        },
         "uri": {
           "type": "string"
         },
@@ -81,6 +84,7 @@
         }
       },
       "required": [
+        "headers",
         "uri",
         "verb",
         "content_type",
@@ -335,6 +339,9 @@
     "response": {
       "type": "object",
       "properties": {
+        "headers": {
+          "type": "string"
+        },
         "status_code": {
           "type": "string",
           "pattern": "^[1-5][0-9][0-9]$"
@@ -353,6 +360,7 @@
         }
       },
       "required": [
+        "headers",
         "status_code",
         "content_type",
         "content_length",
