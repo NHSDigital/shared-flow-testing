@@ -388,7 +388,7 @@ class TestSplunkLogging:
         deny_list = [
             "Accept-Coding",
             "Accept-Language",
-            "Authorization", 
+            "Authorization",
             "Connection",
             "Cookie",
             "Strict-Transport-Security"
