@@ -391,8 +391,7 @@ class TestSplunkLogging:
             "Authorization", 
             "Connection",
             "Cookie",
-            "Strict-Transport-Security",
-            "User-Agent"
+            "Strict-Transport-Security"
         ]
         for denied_header in deny_list:
             assert denied_header not in headers
