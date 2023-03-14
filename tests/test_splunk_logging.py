@@ -385,7 +385,14 @@ class TestSplunkLogging:
 
         headers = json.loads(content["headers"])
 
-        deny_list = ["Authorization", "Cookie", "User-Agent"]
+        deny_list = [
+            "Accept-Coding",
+            "Accept-Language",
+            "Authorization",
+            "Connection",
+            "Cookie",
+            "Strict-Transport-Security"
+        ]
         for denied_header in deny_list:
             assert denied_header not in headers
 
