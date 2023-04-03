@@ -3,5 +3,5 @@
     <DisplayName>FlowCallout.LogToSplunk</DisplayName>
     <FaultRules/>
     <Properties/>
-    <SharedFlowBundle>LogToSplunk</SharedFlowBundle>
+    <SharedFlowBundle>LogToSplunkIncludeHeaders</SharedFlowBundle>
 </FlowCallout>
