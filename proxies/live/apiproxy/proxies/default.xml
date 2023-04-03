@@ -56,6 +56,9 @@
           <Name>OauthV2.VerifyAccessToken</Name>
         </Step>
         <Step>
+          <Name>AssignMessage.Swap.RequestHeaders</Name>
+        </Step>
+        <Step>
           <Name>JavaScript.SetHeaderFields</Name>
         </Step>
       </Request>
