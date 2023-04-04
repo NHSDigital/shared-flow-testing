@@ -6,12 +6,6 @@
             <Header name="Test-Header-Two">this is not the original message</Header>
         </Headers>
     </Set>
-    <Remove>
-        <Headers>
-            <Header name="Test-Header-One"/>
-            <Header name="Test-Header-Two"/>
-        </Headers>
-    </Remove>
     <IgnoreUnresolvedVariables>true</IgnoreUnresolvedVariables>
     <AssignTo createNew="false" transport="http" type="request"/>
 </AssignMessage>
