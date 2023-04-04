@@ -391,7 +391,7 @@ class TestSplunkLogging:
             "Authorization",
             "Connection",
             "Cookie",
-            "Strict-Transport-Security"
+            "Strict-Transport-Security",
         ]
         for denied_header in deny_list:
             assert denied_header not in headers
@@ -469,3 +469,41 @@ class TestSplunkLogging:
         for logged_header in headers_already_logged:
             assert logged_header["header_name"] not in headers
             assert content[logged_header["splunk_key"]] is not None
+
+    @pytest.mark.nhsd_apim_authorization(
+        access="application", level="level3", force_new_token=True
+    )
+    def test_splunk_request_headers_not_overwritten_in_proxy(
+        self, _nhsd_apim_auth_token_data, nhsd_apim_proxy_url, trace
+    ):
+        access_token = _nhsd_apim_auth_token_data["access_token"]
+
+        session_name = str(uuid4())
+        header_filters = {"trace_id": session_name}
+        trace.post_debugsession(session=session_name, header_filters=header_filters)
+
+        # Test-Header-* are overwritten in the AssignMessage.Swap.RequestHeaders policy
+        # on this endpoint with the value: this is not the original message
+        requests.get(
+            url=f"{nhsd_apim_proxy_url}/splunk-test",
+            headers={
+                "Authorization": f"Bearer {access_token}",
+                "Test-Header-One": "foo bar bar foo",
+                "Test-Header-Two": "bar foo foo bar",
+                **header_filters,
+            },
+        )
+
+        splunk_payload = json.loads(
+            get_variable_from_trace(trace, session_name, "splunkCalloutRequest.content")
+        )
+
+        trace.delete_debugsession_by_name(session_name)
+
+        content = splunk_payload["request"]
+        assert content["headers"]
+
+        headers = json.loads(content["headers"])
+
+        assert headers["Test-Header-One"] == "foo bar bar foo"
+        assert headers["Test-Header-Two"] == "bar foo foo bar"
