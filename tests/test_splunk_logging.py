@@ -383,7 +383,7 @@ class TestSplunkLogging:
         content = payload[message_type]
         assert content["headers"]
 
-        headers = json.loads(content["headers"])
+        headers = content["headers"]
 
         deny_list = [
             "Accept-Coding",
@@ -464,7 +464,7 @@ class TestSplunkLogging:
         content = payload[message_type]
         assert content["headers"]
 
-        headers = json.loads(content["headers"])
+        headers = content["headers"]
 
         for logged_header in headers_already_logged:
             assert logged_header["header_name"] not in headers
