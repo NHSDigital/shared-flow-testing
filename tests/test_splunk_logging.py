@@ -383,8 +383,6 @@ class TestSplunkLogging:
         content = payload[message_type]
         assert content["headers"]
 
-        headers = json.loads(content["headers"])
-
         deny_list = [
             "Accept-Coding",
             "Accept-Language",
@@ -394,7 +392,7 @@ class TestSplunkLogging:
             "Strict-Transport-Security",
         ]
         for denied_header in deny_list:
-            assert denied_header not in headers
+            assert denied_header not in content["headers"]
 
     @pytest.mark.nhsd_apim_authorization(
         access="application", level="level3", force_new_token=True
@@ -464,10 +462,8 @@ class TestSplunkLogging:
         content = payload[message_type]
         assert content["headers"]
 
-        headers = json.loads(content["headers"])
-
         for logged_header in headers_already_logged:
-            assert logged_header["header_name"] not in headers
+            assert logged_header["header_name"] not in content["headers"]
             assert content[logged_header["splunk_key"]] is not None
 
     @pytest.mark.nhsd_apim_authorization(
@@ -503,7 +499,7 @@ class TestSplunkLogging:
         content = splunk_payload["request"]
         assert content["headers"]
 
-        headers = json.loads(content["headers"])
+        headers = content["headers"]
 
         assert headers["Test-Header-One"] == "foo bar bar foo"
         assert headers["Test-Header-Two"] == "bar foo foo bar"

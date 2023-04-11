@@ -44,7 +44,7 @@
       "type": "object",
       "properties": {
         "headers": {
-          "type": "string"
+          "type": "object"
         },
         "uri": {
           "type": "string"
@@ -340,7 +340,7 @@
       "type": "object",
       "properties": {
         "headers": {
-          "type": "string"
+          "type": "object"
         },
         "status_code": {
           "type": "string",
