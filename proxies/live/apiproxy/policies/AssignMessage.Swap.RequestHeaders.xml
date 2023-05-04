@@ -2,8 +2,8 @@
 <AssignMessage async="false" continueOnError="false" enabled="true" name="AssignMessage.Swap.RequestHeaders">
     <Set>
         <Headers>
-            <Header name="Test-Header-One">this is not the original message</Header>
-            <Header name="Test-Header-Two">this is not the original message</Header>
+            <Header name="test-header-one">this is not the original message</Header>
+            <Header name="test-header-two">this is not the original message</Header>
         </Headers>
     </Set>
     <IgnoreUnresolvedVariables>true</IgnoreUnresolvedVariables>

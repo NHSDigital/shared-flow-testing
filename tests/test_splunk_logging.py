@@ -384,12 +384,12 @@ class TestSplunkLogging:
         assert content["headers"]
 
         deny_list = [
-            "Accept-Coding",
-            "Accept-Language",
-            "Authorization",
-            "Connection",
-            "Cookie",
-            "Strict-Transport-Security",
+            "accept-coding",
+            "accept-language",
+            "authorization",
+            "connection",
+            "cookie",
+            "strict-transport-security",
         ]
         for denied_header in deny_list:
             assert denied_header not in content["headers"]
@@ -478,14 +478,14 @@ class TestSplunkLogging:
         header_filters = {"trace_id": session_name}
         trace.post_debugsession(session=session_name, header_filters=header_filters)
 
-        # Test-Header-* are overwritten in the AssignMessage.Swap.RequestHeaders policy
+        # test-header-* are overwritten in the AssignMessage.Swap.RequestHeaders policy
         # on this endpoint with the value: this is not the original message
         requests.get(
             url=f"{nhsd_apim_proxy_url}/splunk-test",
             headers={
                 "Authorization": f"Bearer {access_token}",
-                "Test-Header-One": "foo bar bar foo",
-                "Test-Header-Two": "bar foo foo bar",
+                "test-header-one": "foo bar bar foo",
+                "test-header-two": "bar foo foo bar",
                 **header_filters,
             },
         )
@@ -501,5 +501,49 @@ class TestSplunkLogging:
 
         headers = content["headers"]
 
-        assert headers["Test-Header-One"] == "foo bar bar foo"
-        assert headers["Test-Header-Two"] == "bar foo foo bar"
+        assert headers["test-header-one"] == "foo bar bar foo"
+        assert headers["test-header-two"] == "bar foo foo bar"
+    
+    @pytest.mark.nhsd_apim_authorization(
+        access="application", level="level3", force_new_token=True
+    )
+    def test_splunk_headers_logged_lower_case(
+        self, _nhsd_apim_auth_token_data, nhsd_apim_proxy_url, trace
+    ):
+        access_token = _nhsd_apim_auth_token_data["access_token"]
+
+        session_name = str(uuid4())
+        header_filters = {"trace_id": session_name}
+        trace.post_debugsession(session=session_name, header_filters=header_filters)
+
+
+        requests.get(
+            url=f"{nhsd_apim_proxy_url}/splunk-test",
+            headers={
+                "Authorization": f"Bearer {access_token}",
+                "UPPERCASE-HEADER": "foo bar bar foo",
+                "Mixedcase-Header": "bar foo bar foo",
+                "lowercase-header": "far boo far boo",
+                **header_filters,
+            },
+        )
+
+        splunk_payload = json.loads(
+            get_variable_from_trace(trace, session_name, "splunkCalloutRequest.content")
+        )
+
+        trace.delete_debugsession_by_name(session_name)
+
+        content = splunk_payload["request"]
+        assert content["headers"]
+
+        headers = content["headers"]
+
+        assert "UPPERCASE-HEADER" not in headers
+        assert "uppercase-header" in headers
+        assert headers["uppercase-header"] == "foo bar bar foo"
+        assert "Mixedcase-Header" not in headers
+        assert "mixedcase-header" in headers
+        assert headers["mixedcase-header"] == "bar foo bar foo"
+        assert "lowercase-header" in headers
+        assert headers["lowercase-header"] == "far boo far boo"
