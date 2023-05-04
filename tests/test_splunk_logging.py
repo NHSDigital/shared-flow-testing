@@ -503,7 +503,7 @@ class TestSplunkLogging:
 
         assert headers["test-header-one"] == "foo bar bar foo"
         assert headers["test-header-two"] == "bar foo foo bar"
-    
+
     @pytest.mark.nhsd_apim_authorization(
         access="application", level="level3", force_new_token=True
     )
@@ -515,7 +515,6 @@ class TestSplunkLogging:
         session_name = str(uuid4())
         header_filters = {"trace_id": session_name}
         trace.post_debugsession(session=session_name, header_filters=header_filters)
-
 
         requests.get(
             url=f"{nhsd_apim_proxy_url}/splunk-test",
