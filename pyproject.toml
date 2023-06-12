@@ -25,7 +25,7 @@ pytest-sugar = "^0.9.4"
 PyJWT = "^2.3.0"
 python-dotenv = "^0.19.2"
 pytest-rerunfailures = "^10.2"
-pytest-nhsd-apim = "^3.3.1"
+pytest-nhsd-apim = "^3.3.2"
 
 [tool.poetry.dev-dependencies]
 flake8 = "^3.7.9"
