@@ -122,6 +122,8 @@ class TestUserRoles:
             headers={**nhsd_apim_auth_headers, **additional_headers},
         )
 
+        print(resp.json())
+
         assert resp.status_code == 400
         assert resp.json()["issue"][0]["diagnostics"] == error_description
 
