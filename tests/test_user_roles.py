@@ -222,4 +222,5 @@ class TestUserRoles:
         )
 
         assert resp.status_code == status_code
-        assert resp.json()["issue"][0]["diagnostics"] == error_description
+        # assert resp.json()["issue"][0]["diagnostics"] == error_description
+        assert resp.text == error_description
