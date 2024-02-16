@@ -133,7 +133,7 @@ class TestUserRoles:
             pytest.param(
                 {},
                 "selected_roleid is missing in your token",
-                status_code=401,
+                401,
                 marks=pytest.mark.nhsd_apim_authorization(
                     access="patient",
                     level="P9",
@@ -145,7 +145,7 @@ class TestUserRoles:
             pytest.param(
                 {"NHSD-Session-URID": "9912003071"},
                 "unable to retrieve user info",
-                status_code=500,
+                500,
                 marks=pytest.mark.nhsd_apim_authorization(
                     access="patient",
                     level="P9",
@@ -157,7 +157,7 @@ class TestUserRoles:
             pytest.param(
                 {},
                 "selected_roleid is missing in your token",
-                status_code=401,
+                401,
                 marks=pytest.mark.nhsd_apim_authorization(
                     access="patient",
                     level="P9",
@@ -170,7 +170,7 @@ class TestUserRoles:
             pytest.param(
                 {"NHSD-Session-URID": "9912003071"},
                 "unable to retrieve user info",
-                status_code=500,
+                500,
                 marks=pytest.mark.nhsd_apim_authorization(
                     access="patient",
                     level="P9",
@@ -183,7 +183,7 @@ class TestUserRoles:
             pytest.param(
                 {},
                 "selected_roleid is missing in your token",
-                status_code=401,
+                401,
                 marks=pytest.mark.nhsd_apim_authorization(
                     access="healthcare_worker",
                     level="aal3",
@@ -196,7 +196,7 @@ class TestUserRoles:
             pytest.param(
                 {"NHSD-Session-URID": "656005750104"},
                 "unable to retrieve user info",
-                status_code=500,
+                500,
                 marks=pytest.mark.nhsd_apim_authorization(
                     access="healthcare_worker",
                     level="aal3",
