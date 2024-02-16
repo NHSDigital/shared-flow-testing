@@ -56,7 +56,7 @@ class TestUserRoles:
         [
             pytest.param(
                 {},
-                "multiple roles found in user info, please check nhsd-session-urid",
+                "multiple roles found in user info, please check NHSD-Session-URID",
                 401,
                 marks=pytest.mark.nhsd_apim_authorization(
                     access="healthcare_worker",
@@ -68,7 +68,7 @@ class TestUserRoles:
             ),
             pytest.param(
                 {},
-                "no userroles available, please check nhsd-session-urid is valid",
+                "no userroles available, please check NHSD-Session-URID is valid",
                 401,
                 marks=pytest.mark.nhsd_apim_authorization(
                     access="healthcare_worker",
@@ -104,7 +104,7 @@ class TestUserRoles:
             ),
             pytest.param(
                 {"NHSD-Session-URID": "notAuserRole123"},
-                "nhsd-session-urid is invalid",
+                "NHSD-Session-URID is invalid",
                 401,
                 marks=pytest.mark.nhsd_apim_authorization(
                     access="healthcare_worker",
