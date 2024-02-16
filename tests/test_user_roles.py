@@ -128,7 +128,7 @@ class TestUserRoles:
         assert resp.json()["issue"][0]["diagnostics"] == error_description
 
     @pytest.mark.parametrize(
-        "additional_headers,error_description",
+        "additional_headers,error_description,status_code",
         [
             pytest.param(
                 {},
@@ -140,6 +140,7 @@ class TestUserRoles:
                     force_new_token=True,
                 ),
                 id="NHS Login combined: Role can't be used from token",
+                status_code=401
             ),
             pytest.param(
                 {"NHSD-Session-URID": "9912003071"},
@@ -151,6 +152,7 @@ class TestUserRoles:
                     force_new_token=True,
                 ),
                 id="NHS Login combined: Can't use header to fetch from userinfo",
+                status_code=500
             ),
             pytest.param(
                 {},
@@ -163,6 +165,7 @@ class TestUserRoles:
                     force_new_token=True,
                 ),
                 id="NHS Login separate: Role can't be used from token",
+                status_code=401
             ),
             pytest.param(
                 {"NHSD-Session-URID": "9912003071"},
@@ -175,6 +178,7 @@ class TestUserRoles:
                     force_new_token=True,
                 ),
                 id="NHS Login separate: Can't use header to fetch from userinfo",
+                status_code=500
             ),
             pytest.param(
                 {},
@@ -187,6 +191,7 @@ class TestUserRoles:
                     force_new_token=True,
                 ),
                 id="CIS2 separate: Role can't be used from token",
+                status_code=401
             ),
             pytest.param(
                 {"NHSD-Session-URID": "656005750104"},
@@ -199,6 +204,7 @@ class TestUserRoles:
                     force_new_token=True,
                 ),
                 id="CIS2 separate: Can't use header to fetch from userinfo",
+                status_code=500,
             ),
         ],
     )
@@ -208,11 +214,12 @@ class TestUserRoles:
         nhsd_apim_auth_headers,
         additional_headers,
         error_description,
+        status_code
     ):
         resp = requests.get(
             url=f"{nhsd_apim_proxy_url}/user-role-service",
             headers={**nhsd_apim_auth_headers, **additional_headers},
         )
 
-        assert resp.status_code == 400
+        assert resp.status_code == status_code
         assert resp.json()["issue"][0]["diagnostics"] == error_description
