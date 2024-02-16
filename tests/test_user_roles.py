@@ -49,9 +49,10 @@ class TestUserRoles:
         )
 
         assert resp.status_code == 200
+        assert resp.headers["NHSD-Session-URID"] is not None
 
     @pytest.mark.parametrize(
-        "additional_headers,error_description",
+        "additional_headers,error_description,status_code",
         [
             pytest.param(
                 {},
