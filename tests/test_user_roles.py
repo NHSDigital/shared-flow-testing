@@ -133,6 +133,7 @@ class TestUserRoles:
             pytest.param(
                 {},
                 "selected_roleid is missing in your token",
+                status_code=401,
                 marks=pytest.mark.nhsd_apim_authorization(
                     access="patient",
                     level="P9",
@@ -140,11 +141,11 @@ class TestUserRoles:
                     force_new_token=True,
                 ),
                 id="NHS Login combined: Role can't be used from token",
-                status_code=401
             ),
             pytest.param(
                 {"NHSD-Session-URID": "9912003071"},
                 "unable to retrieve user info",
+                status_code=500,
                 marks=pytest.mark.nhsd_apim_authorization(
                     access="patient",
                     level="P9",
@@ -152,11 +153,11 @@ class TestUserRoles:
                     force_new_token=True,
                 ),
                 id="NHS Login combined: Can't use header to fetch from userinfo",
-                status_code=500
             ),
             pytest.param(
                 {},
                 "selected_roleid is missing in your token",
+                status_code=401,
                 marks=pytest.mark.nhsd_apim_authorization(
                     access="patient",
                     level="P9",
@@ -165,11 +166,11 @@ class TestUserRoles:
                     force_new_token=True,
                 ),
                 id="NHS Login separate: Role can't be used from token",
-                status_code=401
             ),
             pytest.param(
                 {"NHSD-Session-URID": "9912003071"},
                 "unable to retrieve user info",
+                status_code=500,
                 marks=pytest.mark.nhsd_apim_authorization(
                     access="patient",
                     level="P9",
@@ -178,11 +179,11 @@ class TestUserRoles:
                     force_new_token=True,
                 ),
                 id="NHS Login separate: Can't use header to fetch from userinfo",
-                status_code=500
             ),
             pytest.param(
                 {},
                 "selected_roleid is missing in your token",
+                status_code=401,
                 marks=pytest.mark.nhsd_apim_authorization(
                     access="healthcare_worker",
                     level="aal3",
@@ -191,11 +192,11 @@ class TestUserRoles:
                     force_new_token=True,
                 ),
                 id="CIS2 separate: Role can't be used from token",
-                status_code=401
             ),
             pytest.param(
                 {"NHSD-Session-URID": "656005750104"},
                 "unable to retrieve user info",
+                status_code=500,
                 marks=pytest.mark.nhsd_apim_authorization(
                     access="healthcare_worker",
                     level="aal3",
@@ -204,7 +205,6 @@ class TestUserRoles:
                     force_new_token=True,
                 ),
                 id="CIS2 separate: Can't use header to fetch from userinfo",
-                status_code=500,
             ),
         ],
     )
