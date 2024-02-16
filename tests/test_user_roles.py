@@ -56,6 +56,7 @@ class TestUserRoles:
             pytest.param(
                 {},
                 "multiple roles found in user info, please check nhsd-session-urid",
+                401,
                 marks=pytest.mark.nhsd_apim_authorization(
                     access="healthcare_worker",
                     level="aal3",
@@ -67,6 +68,7 @@ class TestUserRoles:
             pytest.param(
                 {},
                 "no userroles available, please check nhsd-session-urid is valid",
+                401,
                 marks=pytest.mark.nhsd_apim_authorization(
                     access="healthcare_worker",
                     level="aal3",
@@ -78,6 +80,7 @@ class TestUserRoles:
             pytest.param(
                 {},
                 "selected_roleid is misconfigured/invalid",
+                401,
                 marks=pytest.mark.nhsd_apim_authorization(
                     access="healthcare_worker",
                     level="aal3",
@@ -89,6 +92,7 @@ class TestUserRoles:
             pytest.param(
                 {},
                 "nhsid_nrbac_roles is misconfigured/invalid",
+                401,
                 marks=pytest.mark.nhsd_apim_authorization(
                     access="healthcare_worker",
                     level="aal3",
@@ -100,6 +104,7 @@ class TestUserRoles:
             pytest.param(
                 {"NHSD-Session-URID": "notAuserRole123"},
                 "nhsd-session-urid is invalid",
+                401,
                 marks=pytest.mark.nhsd_apim_authorization(
                     access="healthcare_worker",
                     level="aal3",
@@ -116,15 +121,14 @@ class TestUserRoles:
         nhsd_apim_auth_headers,
         additional_headers,
         error_description,
+        status_code
     ):
         resp = requests.get(
             url=f"{nhsd_apim_proxy_url}/user-role-service",
             headers={**nhsd_apim_auth_headers, **additional_headers},
         )
 
-        print(resp.json())
-
-        assert resp.status_code == 400
+        assert resp.status_code == status_code
         assert resp.json()["issue"][0]["diagnostics"] == error_description
 
     @pytest.mark.parametrize(
@@ -222,5 +226,4 @@ class TestUserRoles:
         )
 
         assert resp.status_code == status_code
-        # assert resp.json()["issue"][0]["diagnostics"] == error_description
-        assert resp.text == error_description
+        assert resp.json()["issue"][0]["diagnostics"] == error_description
