@@ -31,7 +31,7 @@ class TestUserRoles:
                 id="User role in user info - one role - (no header, not in id token)",
             ),
             pytest.param(
-                {"NHSD-Session-URID": "656014452101"},
+                {"NHSD-URID": "656014452101"},
                 "656014452101",
                 marks=pytest.mark.nhsd_apim_authorization(
                     access="healthcare_worker",
@@ -52,14 +52,14 @@ class TestUserRoles:
         )
 
         assert resp.status_code == 200
-        assert resp.headers["NHSD-Session-URID"] == expected_urid
+        assert resp.headers["NHSD-URID"] == expected_urid
 
     @pytest.mark.parametrize(
         "additional_headers,error_description,status_code",
         [
             pytest.param(
                 {},
-                "multiple roles found in user info, please check NHSD-Session-URID",
+                "multiple roles found in user info, please check NHSD-URID",
                 401,
                 marks=pytest.mark.nhsd_apim_authorization(
                     access="healthcare_worker",
@@ -71,7 +71,7 @@ class TestUserRoles:
             ),
             pytest.param(
                 {},
-                "no userroles available, please check NHSD-Session-URID is valid",
+                "no userroles available, please check NHSD-URID is valid",
                 401,
                 marks=pytest.mark.nhsd_apim_authorization(
                     access="healthcare_worker",
@@ -106,8 +106,8 @@ class TestUserRoles:
                 id="nrbac is malformed, or person_roleid is empty (in userinfo)",
             ),
             pytest.param(
-                {"NHSD-Session-URID": "notAuserRole123"},
-                "NHSD-Session-URID is invalid",
+                {"NHSD-URID": "notAuserRole123"},
+                "NHSD-URID is invalid",
                 401,
                 marks=pytest.mark.nhsd_apim_authorization(
                     access="healthcare_worker",
@@ -151,7 +151,7 @@ class TestUserRoles:
                 id="NHS Login combined: Role can't be used from token",
             ),
             pytest.param(
-                {"NHSD-Session-URID": "9912003071"},
+                {"NHSD-URID": "9912003071"},
                 "unable to retrieve user info",
                 500,
                 marks=pytest.mark.nhsd_apim_authorization(
@@ -176,7 +176,7 @@ class TestUserRoles:
                 id="NHS Login separate: Role can't be used from token",
             ),
             pytest.param(
-                {"NHSD-Session-URID": "9912003071"},
+                {"NHSD-URID": "9912003071"},
                 "unable to retrieve user info",
                 500,
                 marks=pytest.mark.nhsd_apim_authorization(
@@ -202,7 +202,7 @@ class TestUserRoles:
                 id="CIS2 separate: Role can't be used from token",
             ),
             pytest.param(
-                {"NHSD-Session-URID": "656005750104"},
+                {"NHSD-URID": "656005750104"},
                 "unable to retrieve user info",
                 500,
                 marks=pytest.mark.nhsd_apim_authorization(
