@@ -123,7 +123,7 @@ class TestUserRoles:
         )
 
         assert resp.status_code == 400
-        assert resp.json() == error_description
+        assert resp.text == error_description
 
     @pytest.mark.parametrize(
         "additional_headers,error_description",
@@ -213,4 +213,4 @@ class TestUserRoles:
         )
 
         assert resp.status_code == 400
-        assert resp.json() == error_description
+        assert resp.text == error_description
