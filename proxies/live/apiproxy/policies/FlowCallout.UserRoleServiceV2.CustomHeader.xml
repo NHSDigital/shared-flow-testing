@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<FlowCallout async="false" continueOnError="false" enabled="true" name="FlowCallout.UserRoleService">
+    <DisplayName>FlowCallout.UserRoleService</DisplayName>
+    <FaultRules/>
+    <Properties/>
+    <Parameters>
+        <Parameter name="user_role_header">NHSD-URID</Parameter>
+    </Parameters>
+    <SharedFlowBundle>UserRoleServiceV2</SharedFlowBundle>
+</FlowCallout>

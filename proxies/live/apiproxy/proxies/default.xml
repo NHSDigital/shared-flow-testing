@@ -13,6 +13,32 @@
       </Response>
       <Condition>proxy.pathsuffix MatchesPath "/user-role-service"</Condition>
     </Flow>
+    <Flow name="UserRoleServiceV2_CustomHeader">
+      <Request>
+        <Step>
+            <Name>FlowCallout.UserRoleServiceV2.CustomHeader</Name>
+        </Step>
+      </Request>
+      <Response>
+        <Step>
+          <Name>AssignMessage.AddPayloadToPing</Name>
+        </Step>
+      </Response>
+      <Condition>proxy.pathsuffix MatchesPath "/user-role-service-v2-custom-header"</Condition>
+    </Flow>
+    <Flow name="UserRoleServiceV2_DefaultHeader">
+      <Request>
+        <Step>
+            <Name>FlowCallout.UserRoleServiceV2.DefaultHeader</Name>
+        </Step>
+      </Request>
+      <Response>
+        <Step>
+          <Name>AssignMessage.AddPayloadToPing</Name>
+        </Step>
+      </Response>
+      <Condition>proxy.pathsuffix MatchesPath "/user-role-service-v2-default-header"</Condition>
+    </Flow>
     <Flow name="OptionsPreFlight">
       <Request/>
       <Response>
