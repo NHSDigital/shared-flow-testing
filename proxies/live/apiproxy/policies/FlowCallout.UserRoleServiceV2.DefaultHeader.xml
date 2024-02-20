@@ -3,5 +3,6 @@
     <DisplayName>FlowCallout.UserRoleServiceV2.DefaultHeader</DisplayName>
     <FaultRules/>
     <Properties/>
-    <SharedFlowBundle>UserRoleServiceV2</SharedFlowBundle>
+    <!-- <SharedFlowBundle>UserRoleServiceV2</SharedFlowBundle> -->
+    <SharedFlowBundle>TestUserRoleService</SharedFlowBundle>
 </FlowCallout>
