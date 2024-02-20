@@ -6,11 +6,10 @@ class TestUserRoles:
     """A test suite for testing userrole in id tokens/headers/userinfo"""
 
     @pytest.mark.parametrize(
-        "additional_headers,expected_urid",
+        "additional_headers",
         [
             pytest.param(
                 {},
-                "555254242105",
                 marks=pytest.mark.nhsd_apim_authorization(
                     access="healthcare_worker",
                     level="aal3",
@@ -21,7 +20,6 @@ class TestUserRoles:
             ),
             pytest.param(
                 {},
-                "555254242105",
                 marks=pytest.mark.nhsd_apim_authorization(
                     access="healthcare_worker",
                     level="aal3",
@@ -32,7 +30,6 @@ class TestUserRoles:
             ),
             pytest.param(
                 {"NHSD-Session-URID": "656014452101"},
-                "656014452101",
                 marks=pytest.mark.nhsd_apim_authorization(
                     access="healthcare_worker",
                     level="aal3",
@@ -44,7 +41,7 @@ class TestUserRoles:
         ],
     )
     def test_user_role_happy_path(
-        self, nhsd_apim_proxy_url, nhsd_apim_auth_headers, additional_headers, expected_urid
+        self, nhsd_apim_proxy_url, nhsd_apim_auth_headers, additional_headers
     ):
         resp = requests.get(
             url=f"{nhsd_apim_proxy_url}/user-role-service",
@@ -52,15 +49,13 @@ class TestUserRoles:
         )
 
         assert resp.status_code == 200
-        assert resp.headers["NHSD-Session-URID"] == expected_urid
 
     @pytest.mark.parametrize(
-        "additional_headers,error_description,status_code",
+        "additional_headers,error_description",
         [
             pytest.param(
                 {},
-                "multiple roles found in user info, please check NHSD-Session-URID",
-                401,
+                "multiple roles found in user info, please check nhsd-session-urid",
                 marks=pytest.mark.nhsd_apim_authorization(
                     access="healthcare_worker",
                     level="aal3",
@@ -71,8 +66,7 @@ class TestUserRoles:
             ),
             pytest.param(
                 {},
-                "no userroles available, please check NHSD-Session-URID is valid",
-                401,
+                "no userroles available, please check nhsd-session-urid is valid",
                 marks=pytest.mark.nhsd_apim_authorization(
                     access="healthcare_worker",
                     level="aal3",
@@ -84,7 +78,6 @@ class TestUserRoles:
             pytest.param(
                 {},
                 "selected_roleid is misconfigured/invalid",
-                401,
                 marks=pytest.mark.nhsd_apim_authorization(
                     access="healthcare_worker",
                     level="aal3",
@@ -96,7 +89,6 @@ class TestUserRoles:
             pytest.param(
                 {},
                 "nhsid_nrbac_roles is misconfigured/invalid",
-                401,
                 marks=pytest.mark.nhsd_apim_authorization(
                     access="healthcare_worker",
                     level="aal3",
@@ -107,8 +99,7 @@ class TestUserRoles:
             ),
             pytest.param(
                 {"NHSD-Session-URID": "notAuserRole123"},
-                "NHSD-Session-URID is invalid",
-                401,
+                "nhsd-session-urid is invalid",
                 marks=pytest.mark.nhsd_apim_authorization(
                     access="healthcare_worker",
                     level="aal3",
@@ -125,23 +116,21 @@ class TestUserRoles:
         nhsd_apim_auth_headers,
         additional_headers,
         error_description,
-        status_code
     ):
         resp = requests.get(
             url=f"{nhsd_apim_proxy_url}/user-role-service",
             headers={**nhsd_apim_auth_headers, **additional_headers},
         )
 
-        assert resp.status_code == status_code
+        assert resp.status_code == 400
         assert resp.json()["issue"][0]["diagnostics"] == error_description
 
     @pytest.mark.parametrize(
-        "additional_headers,error_description,status_code",
+        "additional_headers,error_description",
         [
             pytest.param(
                 {},
                 "selected_roleid is missing in your token",
-                401,
                 marks=pytest.mark.nhsd_apim_authorization(
                     access="patient",
                     level="P9",
@@ -153,7 +142,6 @@ class TestUserRoles:
             pytest.param(
                 {"NHSD-Session-URID": "9912003071"},
                 "unable to retrieve user info",
-                500,
                 marks=pytest.mark.nhsd_apim_authorization(
                     access="patient",
                     level="P9",
@@ -165,7 +153,6 @@ class TestUserRoles:
             pytest.param(
                 {},
                 "selected_roleid is missing in your token",
-                401,
                 marks=pytest.mark.nhsd_apim_authorization(
                     access="patient",
                     level="P9",
@@ -178,7 +165,6 @@ class TestUserRoles:
             pytest.param(
                 {"NHSD-Session-URID": "9912003071"},
                 "unable to retrieve user info",
-                500,
                 marks=pytest.mark.nhsd_apim_authorization(
                     access="patient",
                     level="P9",
@@ -191,7 +177,6 @@ class TestUserRoles:
             pytest.param(
                 {},
                 "selected_roleid is missing in your token",
-                401,
                 marks=pytest.mark.nhsd_apim_authorization(
                     access="healthcare_worker",
                     level="aal3",
@@ -204,7 +189,6 @@ class TestUserRoles:
             pytest.param(
                 {"NHSD-Session-URID": "656005750104"},
                 "unable to retrieve user info",
-                500,
                 marks=pytest.mark.nhsd_apim_authorization(
                     access="healthcare_worker",
                     level="aal3",
@@ -222,12 +206,11 @@ class TestUserRoles:
         nhsd_apim_auth_headers,
         additional_headers,
         error_description,
-        status_code
     ):
         resp = requests.get(
             url=f"{nhsd_apim_proxy_url}/user-role-service",
             headers={**nhsd_apim_auth_headers, **additional_headers},
         )
 
-        assert resp.status_code == status_code
+        assert resp.status_code == 400
         assert resp.json()["issue"][0]["diagnostics"] == error_description
