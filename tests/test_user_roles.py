@@ -48,6 +48,8 @@ class TestUserRoles:
             headers={**nhsd_apim_auth_headers, **additional_headers},
         )
 
+        print(resp.json())
+
         assert resp.status_code == 200
         assert resp.headers["NHSD-Session-URID"] is not None
 
