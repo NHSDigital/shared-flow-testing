@@ -3,8 +3,5 @@
     <DisplayName>FlowCallout.UserRoleService</DisplayName>
     <FaultRules/>
     <Properties/>
-    <Parameters>
-        <Parameter name="user_role_header">NHSD-URID</Parameter>
-    </Parameters>
     <SharedFlowBundle>TestUserRoleService</SharedFlowBundle>
 </FlowCallout>
