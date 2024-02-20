@@ -6,10 +6,11 @@ class TestUserRoles:
     """A test suite for testing userrole in id tokens/headers/userinfo"""
 
     @pytest.mark.parametrize(
-        "additional_headers",
+        "additional_headers,expected_urid",
         [
             pytest.param(
                 {},
+                "555254242105",
                 marks=pytest.mark.nhsd_apim_authorization(
                     access="healthcare_worker",
                     level="aal3",
@@ -20,6 +21,7 @@ class TestUserRoles:
             ),
             pytest.param(
                 {},
+                "555254242105",
                 marks=pytest.mark.nhsd_apim_authorization(
                     access="healthcare_worker",
                     level="aal3",
@@ -30,6 +32,7 @@ class TestUserRoles:
             ),
             pytest.param(
                 {"NHSD-Session-URID": "656014452101"},
+                "656014452101",
                 marks=pytest.mark.nhsd_apim_authorization(
                     access="healthcare_worker",
                     level="aal3",
@@ -41,7 +44,7 @@ class TestUserRoles:
         ],
     )
     def test_user_role_happy_path(
-        self, nhsd_apim_proxy_url, nhsd_apim_auth_headers, additional_headers
+        self, nhsd_apim_proxy_url, nhsd_apim_auth_headers, additional_headers, expected_urid
     ):
         resp = requests.get(
             url=f"{nhsd_apim_proxy_url}/user-role-service",
@@ -49,7 +52,7 @@ class TestUserRoles:
         )
 
         assert resp.status_code == 200
-        assert resp.headers["NHSD-Session-URID"] == "656014452101"
+        assert resp.headers["NHSD-Session-URID"] == expected_urid
 
     @pytest.mark.parametrize(
         "additional_headers,error_description,status_code",
