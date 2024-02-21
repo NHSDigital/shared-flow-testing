@@ -139,6 +139,12 @@
   <RouteRule name="NoRouteUserServiceRole">
     <Condition>(proxy.pathsuffix MatchesPath "/user-role-service") and ((request.verb = "GET") or (request.verb = "HEAD"))</Condition>
   </RouteRule>
+  <RouteRule name="NoRouteUserServiceRoleCustomHeader">
+    <Condition>(proxy.pathsuffix MatchesPath "/user-role-service-v2-custom-header") and ((request.verb = "GET") or (request.verb = "HEAD"))</Condition>
+  </RouteRule>
+  <RouteRule name="NoRouteUserServiceRoleDefaultHeader">
+    <Condition>(proxy.pathsuffix MatchesPath "/user-role-service-v2-default-header") and ((request.verb = "GET") or (request.verb = "HEAD"))</Condition>
+  </RouteRule>
   <RouteRule name="NoRouteExtendedAttributes">
     <Condition>(proxy.pathsuffix MatchesPath "/extended-attributes") and ((request.verb = "GET") or (request.verb = "HEAD"))</Condition>
   </RouteRule>
