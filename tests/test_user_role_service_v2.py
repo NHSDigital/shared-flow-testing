@@ -207,7 +207,8 @@ class TestUserRoles:
         additional_headers,
         expected_urid,
     ):
-        additional_headers["NHSD-URID"] = additional_headers.pop("NHSD-Session-URID", None)
+        # Swap the header names if not done already
+        additional_headers["NHSD-URID"] = additional_headers.pop("NHSD-Session-URID", additional_headers["NHSD-URID"])
 
         print(additional_headers)
 
@@ -251,7 +252,8 @@ class TestUserRoles:
         error_description,
         status_code,
     ):
-        additional_headers["NHSD-URID"] = additional_headers.pop("NHSD-Session-URID", None)
+        # Swap the header names if not done already
+        additional_headers["NHSD-URID"] = additional_headers.pop("NHSD-Session-URID", additional_headers["NHSD-URID"])
         error_description = error_description.replace("NHSD-Session-URID", "NHSD-URID")
 
         resp = requests.get(
@@ -292,7 +294,8 @@ class TestUserRoles:
         error_description,
         status_code,
     ):
-        additional_headers["NHSD-URID"] = additional_headers.pop("NHSD-Session-URID", None)
+        # Swap the header names if not done already
+        additional_headers["NHSD-URID"] = additional_headers.pop("NHSD-Session-URID", additional_headers["NHSD-URID"])
 
         resp = requests.get(
             url=f"{nhsd_apim_proxy_url}/user-role-service-v2-custom-header",
