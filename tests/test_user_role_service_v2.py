@@ -215,14 +215,10 @@ class TestUserRoles:
         # Swap the header names if not done already
         additional_headers = set_custom_header_name(additional_headers)
 
-        print(additional_headers)
-
         resp = requests.get(
             url=f"{nhsd_apim_proxy_url}/user-role-service-v2-custom-header",
             headers={**nhsd_apim_auth_headers, **additional_headers},
         )
-
-        print(resp.json())
 
         assert resp.status_code == 200
         assert resp.headers["NHSD-URID"] == expected_urid
