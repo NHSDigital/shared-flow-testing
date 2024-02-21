@@ -209,6 +209,8 @@ class TestUserRoles:
     ):
         additional_headers["NHSD-URID"] = additional_headers.pop("NHSD-Session-URID", None)
 
+        print(additional_headers)
+
         resp = requests.get(
             url=f"{nhsd_apim_proxy_url}/user-role-service-v2-custom-header",
             headers={**nhsd_apim_auth_headers, **additional_headers},
