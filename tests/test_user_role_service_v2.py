@@ -194,6 +194,8 @@ class TestUserRoles:
             headers={**nhsd_apim_auth_headers, **additional_headers},
         )
 
+        print(resp)
+
         assert resp.status_code == 200
         assert resp.headers["NHSD-Session-URID"] == expected_urid
 
@@ -211,6 +213,8 @@ class TestUserRoles:
             url=f"{nhsd_apim_proxy_url}/user-role-service-v2-custom-header",
             headers={**nhsd_apim_auth_headers, **additional_headers},
         )
+
+        print(resp)
 
         assert resp.status_code == 200
         assert resp.headers["NHSD-URID"] == expected_urid
