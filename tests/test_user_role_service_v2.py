@@ -2,6 +2,11 @@ import pytest
 import requests
 
 
+def set_custom_header_name(headers):
+    default_header = headers.get("NHSD-Session-URID")
+    return {"NHSD-URID": default_header}
+
+
 class TestUserRoles:
     """A test suite for testing userrole in id tokens/headers/userinfo"""
 
@@ -208,7 +213,7 @@ class TestUserRoles:
         expected_urid,
     ):
         # Swap the header names if not done already
-        additional_headers["NHSD-URID"] = additional_headers.pop("NHSD-Session-URID", additional_headers["NHSD-URID"])
+        additional_headers = set_custom_header_name(additional_headers)
 
         print(additional_headers)
 
@@ -253,7 +258,7 @@ class TestUserRoles:
         status_code,
     ):
         # Swap the header names if not done already
-        additional_headers["NHSD-URID"] = additional_headers.pop("NHSD-Session-URID", additional_headers["NHSD-URID"])
+        additional_headers = set_custom_header_name(additional_headers)
         error_description = error_description.replace("NHSD-Session-URID", "NHSD-URID")
 
         resp = requests.get(
@@ -295,7 +300,7 @@ class TestUserRoles:
         status_code,
     ):
         # Swap the header names if not done already
-        additional_headers["NHSD-URID"] = additional_headers.pop("NHSD-Session-URID", additional_headers["NHSD-URID"])
+        additional_headers = set_custom_header_name(additional_headers)
 
         resp = requests.get(
             url=f"{nhsd_apim_proxy_url}/user-role-service-v2-custom-header",
