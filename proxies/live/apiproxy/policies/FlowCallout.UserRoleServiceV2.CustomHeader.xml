@@ -6,6 +6,5 @@
     <Parameters>
         <Parameter name="user_role_header">NHSD-URID</Parameter>
     </Parameters>
-    <!-- <SharedFlowBundle>UserRoleServiceV2</SharedFlowBundle> -->
-    <SharedFlowBundle>TestUserRoleService</SharedFlowBundle>
+    <SharedFlowBundle>UserRoleServiceV2</SharedFlowBundle>
 </FlowCallout>
