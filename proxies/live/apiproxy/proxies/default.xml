@@ -114,6 +114,14 @@
       </Response>
       <Condition>(proxy.pathsuffix MatchesPath "/extended-attributes") and ((request.verb = "GET") or (request.verb = "HEAD"))</Condition>
     </Flow>
+    <Flow name="EnhancedVerifyApiKeyEndpoint">
+      <Request>
+        <Step>
+          <Name>EnhancedVerifyApiKey</Name>
+        </Step>
+      </Request>
+      <Condition>(proxy.pathsuffix MatchesPath "/enhanced-verify-api-key") and ((request.verb = "GET") or (request.verb = "HEAD"))</Condition>
+    </Flow>
   </Flows>
   <PreFlow/>
   <PostClientFlow name="PostClientFlow">
