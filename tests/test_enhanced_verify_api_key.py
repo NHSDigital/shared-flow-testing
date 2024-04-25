@@ -6,7 +6,6 @@ import requests
 @pytest.fixture
 def create_test_app(
     _create_function_scoped_test_app,
-    _proxy_product_with_scope,
     developer_apps_api,
     nhsd_apim_config,
 ):
@@ -30,36 +29,28 @@ def tracing(trace):
     trace.delete_debugsession_by_name(session_name)
 
 
-@pytest.mark.parametrize("apiProducts, expected_status", [
-    (["_proxy_product_with_scope['name']"], 200),
-    ([], 403)
-])
-def test_valid_api_key(
+def test_valid_api_key_products_subscribed(
     nhsd_apim_proxy_url,
-    create_test_app, tracing,
+    create_test_app,
+    tracing,
     _proxy_product_with_scope,
-    apiProducts,
-    expected_status
 ):
     session_name, header_filters = tracing
     apikey = create_test_app["credentials"][0]["consumerKey"]
-    create_test_app["apiProducts"] = ["_proxy_product_with_scope['name']"]
+    create_test_app["apiProducts"] = [_proxy_product_with_scope['name']]
 
     proxy_resp = requests.get(
         url=f"{nhsd_apim_proxy_url}/enhanced-verify-api-key",
         headers={"apikey": apikey, **header_filters},
     )
 
-    assert proxy_resp.status_code == expected_status
+    assert proxy_resp.status_code == 200
 
 
 def test_valid_api_key_no_subscribed_products(
     nhsd_apim_proxy_url,
     create_test_app,
     tracing,
-    proxy_product_with_scope,
-    apiProducts,
-    expected_status
 ):
     session_name, header_filters = tracing
     apikey = create_test_app["credentials"][0]["consumerKey"]
@@ -73,20 +64,15 @@ def test_valid_api_key_no_subscribed_products(
     assert proxy_resp.status_code == 403
 
 
-@pytest.mark.parametrize("apiProducts", [
-    ["_proxy_product_with_scope['name']"],
-    []
-])
 def test_revoked_api_key(
     nhsd_apim_proxy_url,
     create_test_app,
     tracing,
     _proxy_product_with_scope,
-    apiProducts
 ):
     session_name, header_filters = tracing
     apikey = create_test_app["credentials"][0]["consumerKey"]
-    create_test_app["apiProducts"] = apiProducts
+    create_test_app["apiProducts"] = [_proxy_product_with_scope['name']]
     create_test_app["credentials"][0]["status"] = "revoked"
 
     proxy_resp = requests.get(
