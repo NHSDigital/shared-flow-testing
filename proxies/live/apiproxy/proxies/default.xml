@@ -117,7 +117,7 @@
     <Flow name="EnhancedVerifyApiKeyEndpoint">
       <Request>
         <Step>
-          <Name>EnhancedVerifyApiKey</Name>
+          <Name>FlowCallout.EnhancedVerifyApiKey</Name>
         </Step>
       </Request>
       <Condition>(proxy.pathsuffix MatchesPath "/enhanced-verify-api-key") and ((request.verb = "GET") or (request.verb = "HEAD"))</Condition>
