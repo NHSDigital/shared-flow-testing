@@ -54,7 +54,7 @@ def test_valid_api_key_no_subscribed_products(
 ):
     session_name, header_filters = tracing
     apikey = create_test_app["credentials"][0]["consumerKey"]
-    create_test_app["apiProducts"] = []
+    create_test_app["apiProducts"] = ""
 
     proxy_resp = requests.get(
         url=f"{nhsd_apim_proxy_url}/enhanced-verify-api-key",
@@ -71,9 +71,9 @@ def test_revoked_api_key(
     _proxy_product_with_scope,
 ):
     session_name, header_filters = tracing
-    apikey = create_test_app["credentials"][0]["consumerKey"]
     create_test_app["apiProducts"] = [_proxy_product_with_scope['name']]
     create_test_app["credentials"][0]["status"] = "revoked"
+    apikey = create_test_app["credentials"][0]["consumerKey"]
 
     proxy_resp = requests.get(
         url=f"{nhsd_apim_proxy_url}/enhanced-verify-api-key",
