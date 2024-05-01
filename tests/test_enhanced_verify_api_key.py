@@ -1,99 +1,119 @@
-from uuid import uuid4
+from os import getenv
+
 import pytest
 import requests
 
 
-@pytest.fixture
-def create_test_app(
-    _create_function_scoped_test_app,
-    developer_apps_api,
-    nhsd_apim_config,
-):
-    """Fixture for creating test app"""
+class TestEnhancedVerifyApiKey:
+    """Test EnhancedVerifyApiKey Shared Flow"""
 
-    app = _create_function_scoped_test_app
-    app = developer_apps_api.put_app_by_name(
-        email=nhsd_apim_config["APIGEE_DEVELOPER"], app_name=app["name"], body=app
-    )
-    return app
+    def test_valid_api_key_products_subscribed(
+        self,
+        _create_function_scoped_test_app,
+        _proxy_product_with_scope,
+        nhsd_apim_proxy_url,
+        nhsd_apim_config,
+    ):
+        # Create app
+        app = _create_function_scoped_test_app
 
+        app_name = app["name"]
+        apikey = app["credentials"][0]["consumerKey"]
+        email = nhsd_apim_config["APIGEE_DEVELOPER"]
+        json_data = {
+            "apiProducts": [
+                _proxy_product_with_scope["name"]
+            ]
+        }
+        url = (
+            f"https://api.enterprise.apigee.com/v1/organizations/nhsd-nonprod/developers/"
+            f"{email}/apps/{app_name}/keys/{apikey}"
+        )
 
-@pytest.fixture
-def tracing(trace):
-    """Fixture for tracing setup and teardown"""
+        access_token = getenv("APIGEE_ACCESS_TOKEN")
 
-    session_name = str(uuid4())
-    header_filters = {"trace_id": session_name}
-    trace.post_debugsession(session=session_name, header_filters=header_filters)
-    yield session_name, header_filters
-    trace.delete_debugsession_by_name(session_name)
+        # POST apiProducts to app
+        update_proxy_resp = requests.post(
+            url=url,
+            json=json_data,
+            headers={"Authorization": f"Bearer {access_token}", "Content-Type": "application/json"},
+            timeout=60
+        )
 
+        assert update_proxy_resp.status_code == 200
 
-def test_valid_api_key_products_subscribed(
-    nhsd_apim_proxy_url,
-    create_test_app,
-    tracing,
-    _proxy_product_with_scope,
-):
-    session_name, header_filters = tracing
-    create_test_app["credentials"][0]["apiProducts"] = [_proxy_product_with_scope['name']]
-    apikey = create_test_app["credentials"][0]["consumerKey"]
+        proxy_resp = requests.get(
+            url=f"{nhsd_apim_proxy_url}/enhanced-verify-api-key",
+            headers={"apikey": apikey},
+            timeout=60
+        )
 
-    proxy_resp = requests.get(
-        url=f"{nhsd_apim_proxy_url}/enhanced-verify-api-key",
-        headers={"apikey": apikey, **header_filters},
-    )
+        assert proxy_resp.status_code == 200
 
-    assert proxy_resp.status_code == 200
+    def test_valid_api_key_no_subscribed_products(
+        self,
+        _create_function_scoped_test_app,
+        nhsd_apim_proxy_url,
+    ):
+        # Create test app and don't define any apiProducts
+        app = _create_function_scoped_test_app
+        apikey = app["credentials"][0]["consumerKey"]
 
+        proxy_resp = requests.get(
+            url=f"{nhsd_apim_proxy_url}/enhanced-verify-api-key",
+            headers={"apikey": apikey},
+            timeout=60
+        )
 
-def test_valid_api_key_no_subscribed_products(
-    nhsd_apim_proxy_url,
-    create_test_app,
-    tracing,
-):
-    session_name, header_filters = tracing
-    apikey = create_test_app["credentials"][0]["consumerKey"]
-    create_test_app["apiProducts"] = ""
+        assert proxy_resp.status_code == 403
 
-    proxy_resp = requests.get(
-        url=f"{nhsd_apim_proxy_url}/enhanced-verify-api-key",
-        headers={"apikey": apikey, **header_filters},
-    )
+    def test_revoked_api_key(
+        self,
+        _create_function_scoped_test_app,
+        nhsd_apim_proxy_url,
+        nhsd_apim_config,
+    ):
+        app = _create_function_scoped_test_app
+        app_name = app["name"]
+        apikey = app["credentials"][0]["consumerKey"]
+        email = nhsd_apim_config["APIGEE_DEVELOPER"]
 
-    assert proxy_resp.status_code == 403
+        # Revoke credential
+        url = (
+            f"https://api.enterprise.apigee.com/v1/organizations/nhsd-nonprod/developers/"
+            f"{email}/apps/{app_name}/keys/{apikey}?action=revoke"
+        )
 
+        access_token = getenv("APIGEE_ACCESS_TOKEN")
+        update_proxy_resp = requests.post(
+            url=url,
+            headers={"Authorization": f"Bearer {access_token}"},
+            timeout=60
+        )
 
-def test_revoked_api_key(
-    nhsd_apim_proxy_url,
-    create_test_app,
-    tracing,
-    _proxy_product_with_scope,
-):
-    session_name, header_filters = tracing
-    create_test_app["apiProducts"] = [_proxy_product_with_scope['name']]
-    create_test_app["credentials"][0]["status"] = "revoked"
-    apikey = create_test_app["credentials"][0]["consumerKey"]
+        assert update_proxy_resp.status_code == 204
 
-    proxy_resp = requests.get(
-        url=f"{nhsd_apim_proxy_url}/enhanced-verify-api-key",
-        headers={"apikey": apikey, **header_filters},
-    )
+        proxy_resp = requests.get(
+            url=f"{nhsd_apim_proxy_url}/enhanced-verify-api-key",
+            headers={"apikey": apikey},
+            timeout=60
+        )
 
-    assert proxy_resp.status_code == 401
+        assert proxy_resp.status_code == 401
 
+    @pytest.mark.parametrize("apikey, expected_status", [
+        ("123", 401), ("abc", 401), ("123abc", 401)
+    ])
+    def test_invalid_api_key(
+        self,
+        nhsd_apim_proxy_url,
+        expected_status,
+        apikey,
+    ):
+        proxy_resp = requests.get(
+            url=f"{nhsd_apim_proxy_url}/enhanced-verify-api-key",
+            headers={"apikey": apikey},
+            timeout=60
+        )
 
-def test_invalid_api_key(
-    nhsd_apim_proxy_url,
-    create_test_app,
-    tracing
-):
-    session_name, header_filters = tracing
-    apikey = "123"
-
-    proxy_resp = requests.get(
-        url=f"{nhsd_apim_proxy_url}/enhanced-verify-api-key",
-        headers={"apikey": apikey, **header_filters},
-    )
-
-    assert proxy_resp.status_code == 401
+        assert proxy_resp.status_code == expected_status
