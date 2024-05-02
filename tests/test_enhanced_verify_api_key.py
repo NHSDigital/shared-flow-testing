@@ -7,14 +7,15 @@ import requests
 class TestEnhancedVerifyApiKey:
     """Test EnhancedVerifyApiKey Shared Flow"""
 
-    @pytest.mark.parametrize("expected_status_code", [(200)])
+    @pytest.mark.parametrize("expected_status_code, expected_message", [(200, "share-flow-testing")])
     def test_valid_api_key_products_subscribed(
         self,
         _create_function_scoped_test_app,
         _proxy_product_with_scope,
         nhsd_apim_proxy_url,
         nhsd_apim_config,
-        expected_status_code
+        expected_status_code,
+        expected_message
     ):
         # Create app with products
         app = _create_function_scoped_test_app
@@ -50,6 +51,7 @@ class TestEnhancedVerifyApiKey:
         )
 
         assert proxy_resp.status_code == expected_status_code
+        assert proxy_resp.json().get("message") == expected_message
 
     @pytest.mark.parametrize("expected_status_code, expected_message", [(403, "no_products")])
     def test_valid_api_key_no_subscribed_products(
@@ -72,13 +74,14 @@ class TestEnhancedVerifyApiKey:
         assert proxy_resp.status_code == expected_status_code
         assert proxy_resp.json().get("error") == expected_message
 
-    @pytest.mark.parametrize("expected_status_code", [(401)])
+    @pytest.mark.parametrize("expected_status_code, expected_message", [(401, "ApiKey not approved")])
     def test_revoked_api_key(
         self,
         _create_function_scoped_test_app,
         nhsd_apim_proxy_url,
         nhsd_apim_config,
-        expected_status_code
+        expected_status_code,
+        expected_message
     ):
         app = _create_function_scoped_test_app
         app_name = app["name"]
@@ -109,6 +112,9 @@ class TestEnhancedVerifyApiKey:
 
         assert proxy_resp.status_code == expected_status_code
 
+        error_msg_resp = proxy_resp.json().get("fault", {}).get("faultstring")
+        assert error_msg_resp == expected_message
+
     @pytest.mark.parametrize("apikey, expected_status_code", [
         ("123", 401), ("abc", 401), ("123abc", 401)
     ])
@@ -126,13 +132,14 @@ class TestEnhancedVerifyApiKey:
 
         assert proxy_resp.status_code == expected_status_code
 
-    @pytest.mark.parametrize("expected_status_code", [(401)])
+    @pytest.mark.parametrize("expected_status_code, expected_message", [(401, "Invalid ApiKey for given resource")])
     def test_valid_api_key_incorrect_product(
         self,
         _create_function_scoped_test_app,
         nhsd_apim_proxy_url,
         nhsd_apim_config,
-        expected_status_code
+        expected_status_code,
+        expected_message
     ):
         # Create app with an incorrect product
         app = _create_function_scoped_test_app
@@ -168,3 +175,6 @@ class TestEnhancedVerifyApiKey:
         )
 
         assert proxy_resp.status_code == expected_status_code
+
+        error_msg_resp = proxy_resp.json().get("fault", {}).get("faultstring")
+        assert error_msg_resp == expected_message
