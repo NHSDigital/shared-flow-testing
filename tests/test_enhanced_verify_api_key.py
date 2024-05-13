@@ -53,7 +53,7 @@ class TestEnhancedVerifyApiKey:
         assert proxy_resp.status_code == expected_status_code
         assert proxy_resp.json().get("message") == expected_message
 
-    @pytest.mark.parametrize("expected_status_code, expected_message", [(403, "no_products")])
+    @pytest.mark.parametrize("expected_status_code, expected_message", [(401, "no_products")])
     def test_valid_api_key_no_subscribed_products(
         self,
         _create_function_scoped_test_app,
