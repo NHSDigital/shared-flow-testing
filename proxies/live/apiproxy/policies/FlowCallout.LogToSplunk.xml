@@ -3,5 +3,5 @@
     <DisplayName>FlowCallout.LogToSplunk</DisplayName>
     <FaultRules/>
     <Properties/>
-    <SharedFlowBundle>LogToSplunkTemp</SharedFlowBundle>
+    <SharedFlowBundle>LogToSplunk</SharedFlowBundle>
 </FlowCallout>
