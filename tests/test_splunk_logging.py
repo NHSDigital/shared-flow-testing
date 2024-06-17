@@ -56,6 +56,30 @@ class TestSplunkLogging:
         # If no exception is raised by validate(), the instance is valid.
         validate(instance=payload, schema=schema)
 
+    def test_splunk_payload_client_sent_timestamp(
+        self,
+        nhsd_apim_auth_headers,
+        nhsd_apim_proxy_url,
+        trace,
+    ):
+        session_name = str(uuid4())
+        header_filters = {"trace_id": session_name}
+        trace.post_debugsession(session=session_name, header_filters=header_filters)
+
+        requests.get(
+            url=f"{nhsd_apim_proxy_url}/splunk-test",
+            headers={**nhsd_apim_auth_headers, **header_filters},
+        )
+
+        payload = json.loads(
+            get_variable_from_trace(trace, session_name, "splunkCalloutRequest.content")
+        )
+
+        trace.delete_debugsession_by_name(session_name)
+
+        assert payload["client"]["sent_start"] > 0
+        assert payload["client"]["sent_end"] > 0
+
     def test_splunk_payload_schema_open_access(
         self,
         nhsd_apim_proxy_url,
