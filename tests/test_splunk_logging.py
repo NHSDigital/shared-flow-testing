@@ -77,8 +77,8 @@ class TestSplunkLogging:
 
         trace.delete_debugsession_by_name(session_name)
 
-        assert payload["client"]["sent_start"] > 0
-        assert payload["client"]["sent_end"] > 0
+        assert int(payload["client"]["sent_start"]) > 0
+        assert int(payload["client"]["sent_end"]) > 0
 
     def test_splunk_payload_schema_open_access(
         self,
