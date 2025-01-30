@@ -10,6 +10,7 @@ authors = [
 ]
 readme = 'README.md'
 license = "MIT"
+package-mode = false
 repository = "https://github.com/NHSDigital/shared-flow-testing"
 homepage = "https://github.com/NHSDigital/shared-flow-testing"
 keywords = ["healthcare", "uk", "nhs"] #TODO add additional keywords
