@@ -1,5 +1,5 @@
 [project]
-python = "^3.9"
+python = "^3.8"
 
 [tool.poetry]
 name = "shared-flow-testing"
@@ -10,14 +10,13 @@ authors = [
 ]
 readme = 'README.md'
 license = "MIT"
-package-mode = false
 repository = "https://github.com/NHSDigital/shared-flow-testing"
 homepage = "https://github.com/NHSDigital/shared-flow-testing"
 keywords = ["healthcare", "uk", "nhs"] #TODO add additional keywords
 
 
 [tool.poetry.dependencies]
-python = "^3.9"
+python = "^3.8"
 requests = "^2.25.1"
 assertpy = "^1.1"
 pytest-docker = "^0.10.3"
