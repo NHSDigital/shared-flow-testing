@@ -35,6 +35,18 @@ HAPPY_PATH_PARAMS = [
         ),
         id="User role sent in header (no in id token, multiple in user info)",
     ),
+    pytest.param(
+        {"NHSD-Session-URID": "656014452101"},
+        "656014452101",
+        marks=pytest.mark.nhsd_apim_authorization(
+            access="healthcare_worker",
+            level="aal3",
+            login_form={"username": "656005750104"},
+            authentication="separate",
+            force_new_token=True,
+        ),
+        id="CIS2 separate: User role sent in header",
+    ),
 ]
 UNHAPPY_PATH_PARAMS = [
     pytest.param(
@@ -123,58 +135,6 @@ WHEN_NOT_CIS2_PARAMS = [
             force_new_token=True,
         ),
         id="NHS Login combined: Can't use header to fetch from userinfo",
-    ),
-    pytest.param(
-        {},
-        "selected_roleid is missing in your token",
-        401,
-        marks=pytest.mark.nhsd_apim_authorization(
-            access="patient",
-            level="P9",
-            login_form={"username": "9912003071"},
-            authentication="separate",
-            force_new_token=True,
-        ),
-        id="NHS Login separate: Role can't be used from token",
-    ),
-    pytest.param(
-        {"NHSD-Session-URID": "9912003071"},
-        "unable to retrieve user info",
-        500,
-        marks=pytest.mark.nhsd_apim_authorization(
-            access="patient",
-            level="P9",
-            login_form={"username": "9912003071"},
-            authentication="separate",
-            force_new_token=True,
-        ),
-        id="NHS Login separate: Can't use header to fetch from userinfo",
-    ),
-    pytest.param(
-        {},
-        "selected_roleid is missing in your token",
-        401,
-        marks=pytest.mark.nhsd_apim_authorization(
-            access="healthcare_worker",
-            level="aal3",
-            login_form={"username": "656005750104"},
-            authentication="separate",
-            force_new_token=True,
-        ),
-        id="CIS2 separate: Role can't be used from token",
-    ),
-    pytest.param(
-        {"NHSD-Session-URID": "656005750104"},
-        "unable to retrieve user info",
-        500,
-        marks=pytest.mark.nhsd_apim_authorization(
-            access="healthcare_worker",
-            level="aal3",
-            login_form={"username": "656005750104"},
-            authentication="separate",
-            force_new_token=True,
-        ),
-        id="CIS2 separate: Can't use header to fetch from userinfo",
     ),
 ]
 
