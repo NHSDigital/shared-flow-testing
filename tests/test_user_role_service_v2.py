@@ -35,18 +35,6 @@ HAPPY_PATH_PARAMS = [
         ),
         id="User role sent in header (no in id token, multiple in user info)",
     ),
-    pytest.param(
-        {"NHSD-Session-URID": "656014452101"},
-        "656014452101",
-        marks=pytest.mark.nhsd_apim_authorization(
-            access="healthcare_worker",
-            level="aal3",
-            login_form={"username": "656005750104"},
-            authentication="separate",
-            force_new_token=True,
-        ),
-        id="CIS2 separate: User role sent in header",
-    ),
 ]
 UNHAPPY_PATH_PARAMS = [
     pytest.param(
@@ -135,6 +123,20 @@ WHEN_NOT_CIS2_PARAMS = [
             force_new_token=True,
         ),
         id="NHS Login combined: Can't use header to fetch from userinfo",
+    ),
+]
+SEPARATE_AUTH_HAPPY_PARAMS = [
+    pytest.param(
+        {"NHSD-Session-URID": "656014452101"},
+        "656014452101",
+        marks=pytest.mark.nhsd_apim_authorization(
+            access="healthcare_worker",
+            level="aal3",
+            login_form={"username": "656005750104"},
+            authentication="separate",
+            force_new_token=True,
+        ),
+        id="CIS2 separate: User role sent in header",
     ),
 ]
 
@@ -249,3 +251,21 @@ class TestUserRoles:
 
         assert resp.status_code == status_code
         assert resp.json()["issue"][0]["diagnostics"] == error_description
+
+    @pytest.mark.parametrize("additional_headers,expected_urid", SEPARATE_AUTH_HAPPY_PARAMS)
+    def test_separate_auth_happy_path_default_header(
+        self,
+        nhsd_apim_proxy_url,
+        nhsd_apim_auth_headers,
+        additional_headers,
+        expected_urid,
+    ):
+        """Due to the nature of separate auth (token_exchange), we can't use custom headers and we do not do any
+        specific validation. Therefore we can only test for the happy path returning a 200 response"""
+
+        resp = requests.get(
+            url=f"{nhsd_apim_proxy_url}/user-role-service-v2-default-header",
+            headers={**nhsd_apim_auth_headers, **additional_headers},
+        )
+
+        assert resp.status_code == 200
