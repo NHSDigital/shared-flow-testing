@@ -131,6 +131,7 @@ app.all("/hello", handlers.hello);
 app.get("/open-access", handlers.sampleResponse);
 app.get("/splunk-test", handlers.sampleResponse);
 app.get("/apikey-protected", handlers.sampleResponse);
+app.get("/enhanced-verify-api-key", handlers.sampleResponse);
 
 app.use(on_error)
 app.use(after_request);
