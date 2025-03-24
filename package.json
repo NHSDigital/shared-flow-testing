@@ -12,14 +12,14 @@
   "license": "MIT",
   "homepage": "https://github.com/NHSDigital/shared-flow-testing",
   "dependencies": {
-    "newman-reporter-htmlextra": "^1.20.1",
+    "newman-reporter-htmlextra": "^1.22.6",
     "speccy": "^0.11.0"
   },
   "devDependencies": {
-    "apigeetool": "^0.14.2",
+    "apigeetool": "^0.16.5",
     "license-checker": "^25.0.1",
     "minimist": "^1.2.2",
-    "newman": "^4.5.7",
-    "newman-reporter-html": "^1.0.5"
+    "newman": "^6.2.1",
+    "newman-reporter-html": "^1.0.4"
   }
 }
