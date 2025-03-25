@@ -24,8 +24,6 @@ publish: clean
 	mkdir -p build
 	npm run publish 2> /dev/null
 
-serve:
-	npm run serve
 
 check-licenses:
 	npm run check-licenses
@@ -54,6 +52,6 @@ test:
 #	this target should be used for local unit tests ..  runs as part of the build pipeline
 	make --no-print-directory -C sandbox test
 
-smoketest:
+smoketest: test
 #	this target is for end to end smoketests this would be run 'post deploy' to verify an environment is working
-	poetry run pytest -v tests/api_tests.py --junitxml=smoketest-report.xml -s
+	poetry run pytest -v tests/
