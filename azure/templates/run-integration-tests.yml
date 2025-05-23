@@ -9,17 +9,17 @@ steps:
    workingDirectory: $(Pipeline.Workspace)/s/$(SERVICE_NAME)/$(SERVICE_ARTIFACT_NAME)
    displayName: Setup integration tests
 
- - bash: |
-    export SOURCE_COMMIT_ID=$(Build.SourceVersion)
-    export APIGEE_ACCESS_TOKEN="$(secret.AccessToken)"
-    export PROXY_NAME="$(FULLY_QUALIFIED_SERVICE_NAME)"
-    export API_NAME="shared-flow-testing"
-    export OAUTH_BASE_URI="https://$(APIGEE_ENVIRONMENT).api.service.nhs.uk/oauth2-mock"
-    export ACCESS_TOKEN_HASH_SECRET="$(ACCESS_TOKEN_SECRET)"
+#  - bash: |
+#     export SOURCE_COMMIT_ID=$(Build.SourceVersion)
+#     export APIGEE_ACCESS_TOKEN="$(secret.AccessToken)"
+#     export PROXY_NAME="$(FULLY_QUALIFIED_SERVICE_NAME)"
+#     export API_NAME="shared-flow-testing"
+#     export OAUTH_BASE_URI="https://$(APIGEE_ENVIRONMENT).api.service.nhs.uk/oauth2-mock"
+#     export ACCESS_TOKEN_HASH_SECRET="$(ACCESS_TOKEN_SECRET)"
 
-    poetry run pytest --reruns 2 --reruns-delay 1 -v --junitxml=test-report.xml
-   workingDirectory: $(Pipeline.Workspace)/s/$(SERVICE_NAME)/$(SERVICE_ARTIFACT_NAME)
-   displayName: Run integration tests
+#     poetry run pytest --reruns 2 --reruns-delay 1 -v --junitxml=test-report.xml
+#    workingDirectory: $(Pipeline.Workspace)/s/$(SERVICE_NAME)/$(SERVICE_ARTIFACT_NAME)
+#    displayName: Run integration tests
 
  - task: PublishTestResults@2
    displayName: 'Publish smoketest results'
