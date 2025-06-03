@@ -9,7 +9,7 @@ This is a RESTful HL7® FHIR® API specification for the *Template API*.
 * `scripts/` Utilities helpful to developers of this specification.
 * `proxies/` Live (connecting to another service) and sandbox (using the sandbox container) Apigee API Proxy definitions.
 
-Consumers of the API will find developer documentation on the [NHS Digital Developer Hub](https://developer.digital.nhs.uk/).
+Consumers of the API will  find developer documentation on the [NHS Digital Developer Hub](https://developer.digital.nhs.uk/).
 
 ## Contributing
 Contributions to this project are welcome from anyone, providing that they conform to the [guidelines for contribution](https://github.com/NHSDigital/shared-flow-testing/blob/master/CONTRIBUTING.md) and the [community code of conduct](https://github.com/NHSDigital/shared-flow-testing/blob/master/CODE_OF_CONDUCT.md).
