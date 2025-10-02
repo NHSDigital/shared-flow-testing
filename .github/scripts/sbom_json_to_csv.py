@@ -1,7 +1,7 @@
 import json
 import csv
 import sys
-from pathlib import Path
+# from pathlib import Path
 from tabulate import tabulate
 
 input_file = sys.argv[1] if len(sys.argv) > 1 else "sbom.json"
@@ -23,6 +23,7 @@ columns = [
     "externalRefs"
 ]
 
+
 def get_type(pkg):
     spdxid = pkg.get("SPDXID", "")
     if "-" in spdxid:
@@ -35,9 +36,11 @@ def get_type(pkg):
             return ref.get("referenceLocator", "").split("/")[0]
     return ""
 
+
 def get_external_refs(pkg):
     refs = pkg.get("externalRefs", [])
     return ";".join([ref.get("referenceLocator", "") for ref in refs])
+
 
 with open(output_file, "w", newline="", encoding="utf-8") as csvfile:
     writer = csv.DictWriter(csvfile, fieldnames=columns)
@@ -56,6 +59,7 @@ with open(output_file, "w", newline="", encoding="utf-8") as csvfile:
         writer.writerow(row)
 
 print(f"CSV export complete: {output_file}")
+
 
 with open("sbom_table.txt", "w", encoding="utf-8") as f:
     table = []
