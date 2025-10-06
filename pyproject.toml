@@ -1,5 +1,5 @@
 [project]
-python = "^3.8"
+python = "^3.9"
 
 [tool.poetry]
 name = "shared-flow-testing"
@@ -16,7 +16,7 @@ keywords = ["healthcare", "uk", "nhs"] #TODO add additional keywords
 
 
 [tool.poetry.dependencies]
-python = "^3.8"
+python = "^3.9"
 requests = "^2.25.1"
 assertpy = "^1.1"
 pytest-docker = "^0.10.3"
