@@ -43,3 +43,7 @@ aiohttp = "^3.7.3"
 pytest-asyncio = "^0.14.0"
 
 [tool.poetry.scripts]
+
+[tool.poetry.group.dev.dependencies]
+flake8 = "^7.3.0"
+
