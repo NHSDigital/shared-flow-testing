@@ -7,6 +7,28 @@ trigger:
   tags:
     include:
       - v*
+trigger:
+- main
+
+pool:
+  vmImage: 'ubuntu-latest'
+
+steps:
+- task: UsePythonVersion@0
+  inputs:
+    versionSpec: '3.x'
+    addToPath: true
+
+- script: |
+    pip install poetry
+    poetry install
+    poetry add --dev flake8
+  displayName: 'Install Poetry and flake8'
+
+- script: |
+    find . -name '*.py' -not -path '**/.venv/*' -not -path '**/.direnv/*' | xargs poetry run flake8
+  displayName: 'Run flake8 linting'
+
 
 pr:
   branches:
