@@ -1,7 +1,5 @@
 name: Dependabot auto-merge
-
-on:
-  pull_request:
+on: pull_request
 
 permissions:
   contents: write
@@ -14,11 +12,11 @@ jobs:
     steps:
       - name: Dependabot metadata
         id: metadata
-        uses: dependabot/fetch-metadata@v2
+        uses: dependabot/fetch-metadata@21025c7d3b7c1eb5122b2f4f30b18d6c8b8c52df # v2.5.0
         with:
           github-token: "${{ secrets.GITHUB_TOKEN }}"
 
-      - name: Approve PR
+      - name: Approve Dependabot PR
         run: gh pr review --approve "$PR_URL"
         env:
           PR_URL: ${{ github.event.pull_request.html_url }}
