@@ -9,22 +9,36 @@ permissions:
 
 jobs:
   dependabot:
+    name: Approve & auto-merge Dependabot PRs
     runs-on: ubuntu-latest
+
+    # Only run for PRs opened by Dependabot
     if: github.event.pull_request.user.login == 'dependabot[bot]'
+
     steps:
+      # 1) Fetch Dependabot metadata (pinned SHA + tag comment for humans/renovators)
       - name: Dependabot metadata
         id: metadata
-        uses: dependabot/fetch-metadata@21025c7d3b7c1eb5122b2f4f30b18d6c8b8c52df # v2.5.0
+        uses: dependabot/fetch-metadata@21025c7d3b7c1eb5122b2f4f30b18d6c8b8c52df
         with:
-          github-token: "${{ secrets.GITHUB_TOKEN }}"
+          github-token: ${{ secrets.GITHUB_TOKEN }}
 
-      - name: Approve PR
+      # 2) (Optional) Log what’s being updated for troubleshooting
+      - name: Summarize update
+        run: |
+          echo "Dependencies: ${{ steps.metadata.outputs.dependency-names }}"
+          echo "Update type:  ${{ steps.metadata.outputs.update-type }}"
+
+      # 3) Approve the PR (required if code owner reviews are enforced)
+      - name: Approve Dependabot PR
         run: gh pr review --approve "$PR_URL"
         env:
           PR_URL: ${{ github.event.pull_request.html_url }}
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
-      - name: Enable auto-merge
+      # 4) Enable auto-merge for safe updates (patch + minor).
+      #    Adjust the condition if you want patch-only or include majors.
+      - name: Enable auto-merge (patch/minor)
         if: |
           steps.metadata.outputs.update-type == 'version-update:semver-patch' ||
           steps.metadata.outputs.update-type == 'version-update:semver-minor'
