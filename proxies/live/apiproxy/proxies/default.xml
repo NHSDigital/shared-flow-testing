@@ -122,6 +122,19 @@
       </Request>
       <Condition>(proxy.pathsuffix MatchesPath "/enhanced-verify-api-key") and ((request.verb = "GET") or (request.verb = "HEAD"))</Condition>
     </Flow>
+    <Flow name="SingleASIDApply">
+            <Description/>
+            <Request>
+                <Step>
+                    <Name>OauthV2.VerifyAccessToken</Name>
+                </Step>
+                <Step>
+                    <Name>FlowCalloutSingleASIDApply</Name>
+                </Step>
+            </Request>
+            <Response/>
+            <Condition>(proxy.pathsuffix MatchesPath "/single-asid") and ((request.verb = "GET") or (request.verb = "HEAD"))</Condition>
+    </Flow>
   </Flows>
   <PreFlow/>
   <PostClientFlow name="PostClientFlow">
@@ -156,6 +169,9 @@
   <RouteRule name="NoRouteExtendedAttributes">
     <Condition>(proxy.pathsuffix MatchesPath "/extended-attributes") and ((request.verb = "GET") or (request.verb = "HEAD"))</Condition>
   </RouteRule>
+  <RouteRule name="NoRouteSingleASIDApply">
+        <Condition>(proxy.pathsuffix MatchesPath "/single-asid") and ((request.verb = "GET") or (request.verb = "HEAD"))</Condition>
+    </RouteRule>
   <RouteRule name="shared-flow-testing-target">
     <TargetEndpoint>shared-flow-testing-target</TargetEndpoint>
   </RouteRule>
