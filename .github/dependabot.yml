@@ -1,81 +1,46 @@
-# .github/dependabot.yml
 version: 2
 updates:
 
-  #######################################
-  #  GitHub Actions (Security Best Practice)
-  #######################################
-  - package-ecosystem: "github-actions"
-    directory: "/"
-    schedule:
-      interval: "daily"
-    labels:
-      - "dependabot"
-    commit-message:
-      prefix: "deps"
-      include: "scope"
-
-  #######################################
-  #  Python (pip) — e.g., requirements.txt
-  #######################################
+  # --- Python (Poetry via pip ecosystem) ---
   - package-ecosystem: "pip"
     directory: "/"
     schedule:
       interval: "daily"
-    labels:
-      - "dependabot"
-    commit-message:
-      prefix: "pip"
-      include: "scope"
+    target-branch: "master"
+    labels: ["dependencies", "python", "poetry"]
+    open-pull-requests-limit: 10
+    ignore:
+      - dependency-name: "*"
+        update-types: ["version-update:semver-major"]
 
-  #######################################
-  #  Docker Dependencies — updates FROM images
-  #######################################
-  - package-ecosystem: "docker"
-    directory: "/"
-    schedule:
-      interval: "daily"
-    labels:
-      - "dependabot"
-    commit-message:
-      prefix: "docker"
-      include: "scope"
-
-  #######################################
-  #  Maven (pom.xml)
-  #######################################
-  - package-ecosystem: "maven"
-    directory: "/"
-    schedule:
-      interval: "daily"
-    labels:
-      - "dependabot"
-    commit-message:
-      prefix: "maven"
-      include: "scope"
-
-  #######################################
-  #  Gradle (build.gradle, gradle.properties)
-  #######################################
-  - package-ecosystem: "gradle"
-    directory: "/"
-    schedule:
-      interval: "daily"
-    labels:
-      - "dependabot"
-    commit-message:
-      prefix: "gradle"
-      include: "scope"
-
-  #######################################
-  #  JavaScript (npm / package.json)
-  #######################################
+  # --- NodeJS (root) ---
   - package-ecosystem: "npm"
     directory: "/"
     schedule:
       interval: "daily"
-    labels:
-      - "dependabot"
-    commit-message:
-      prefix: "npm"
-      include: "scope"
+    target-branch: "master"
+    labels: ["dependencies", "npm"]
+    open-pull-requests-limit: 10
+    ignore:
+      - dependency-name: "*"
+        update-types: ["version-update:semver-major"]
+
+  # --- NodeJS (sandbox/) ---
+  - package-ecosystem: "npm"
+    directory: "/sandbox"
+    schedule:
+      interval: "daily"
+    target-branch: "master"
+    labels: ["dependencies", "npm", "sandbox"]
+    open-pull-requests-limit: 10
+    ignore:
+      - dependency-name: "*"
+        update-types: ["version-update:semver-major"]
+
+  # --- GitHub Actions ---
+  - package-ecosystem: "github-actions"
+    directory: "/"
+    schedule:
+      interval: "daily"
+    target-branch: "master"
+    labels: ["dependencies", "github-actions"]
