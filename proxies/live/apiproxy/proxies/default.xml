@@ -1,167 +1,193 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
 <ProxyEndpoint name="default">
-  <Flows>
-    <Flow name="UserRoleService">
-      <Request>
-        <Step>
-            <Name>FlowCallout.UserRoleService</Name>
-        </Step>
-      </Request>
-      <Response>
-        <Step>
-          <Name>AssignMessage.AddPayloadToPing</Name>
-        </Step>
-      </Response>
-      <Condition>proxy.pathsuffix MatchesPath "/user-role-service"</Condition>
-    </Flow>
-    <Flow name="UserRoleServiceV2_CustomHeader">
-      <Request>
-        <Step>
-            <Name>FlowCallout.UserRoleServiceV2.CustomHeader</Name>
-        </Step>
-      </Request>
-      <Response>
-        <Step>
-          <Name>AssignMessage.AddPayloadToPing</Name>
-        </Step>
-      </Response>
-      <Condition>proxy.pathsuffix MatchesPath "/user-role-service-v2-custom-header"</Condition>
-    </Flow>
-    <Flow name="UserRoleServiceV2_DefaultHeader">
-      <Request>
-        <Step>
-            <Name>FlowCallout.UserRoleServiceV2.DefaultHeader</Name>
-        </Step>
-      </Request>
-      <Response>
-        <Step>
-          <Name>AssignMessage.AddPayloadToPing</Name>
-        </Step>
-      </Response>
-      <Condition>proxy.pathsuffix MatchesPath "/user-role-service-v2-default-header"</Condition>
-    </Flow>
-    <Flow name="OptionsPreFlight">
-      <Request/>
-      <Response>
-        <Step>
-          <Name>AssignMessage.AddCors</Name>
-        </Step>
-      </Response>
-      <Condition>(request.verb = "OPTIONS") and (request.header.origin != null) and (request.header.Access-Control-Request-Method != null)</Condition>
-    </Flow>
-    <Flow name="AddPayloadToPing">
-      <Description/>
-      <Request/>
-      <Response>
-        <Step>
-          <Name>AssignMessage.AddPayloadToPing</Name>
-        </Step>
-      </Response>
-      <Condition>(proxy.pathsuffix MatchesPath "/_ping") and ((request.verb = "GET") or (request.verb = "HEAD"))</Condition>
-    </Flow>
-    <Flow name="StatusEndpoint">
-      <Request>
-        <Step>
-          <Condition>request.header.apikey = null or private.common.status-endpoint-api-key != request.header.apikey</Condition>
-          <Name>RaiseFault.401Unauthorized</Name>
-        </Step>
-        <Step>
-          <Name>ServiceCallout.CallHealthcheckEndpoint</Name>
-        </Step>
-      </Request>
-      <Response>
-        <Step>
-          <Name>javascript.SetStatusResponse</Name>
-        </Step>
-      </Response>
-      <Condition>(proxy.pathsuffix MatchesPath "/_status") and ((request.verb = "GET") or (request.verb = "HEAD"))
+    <Flows>
+        <Flow name="UserRoleService">
+            <Request>
+                <Step>
+                    <Name>FlowCallout.UserRoleService</Name>
+                </Step>
+            </Request>
+            <Response>
+                <Step>
+                    <Name>AssignMessage.AddPayloadToPing</Name>
+                </Step>
+            </Response>
+            <Condition>proxy.pathsuffix MatchesPath "/user-role-service"</Condition>
+        </Flow>
+        <Flow name="UserRoleServiceV2_CustomHeader">
+            <Request>
+                <Step>
+                    <Name>FlowCallout.UserRoleServiceV2.CustomHeader</Name>
+                </Step>
+            </Request>
+            <Response>
+                <Step>
+                    <Name>AssignMessage.AddPayloadToPing</Name>
+                </Step>
+            </Response>
+            <Condition>proxy.pathsuffix MatchesPath "/user-role-service-v2-custom-header"</Condition>
+        </Flow>
+        <Flow name="UserRoleServiceV2_DefaultHeader">
+            <Request>
+                <Step>
+                    <Name>FlowCallout.UserRoleServiceV2.DefaultHeader</Name>
+                </Step>
+            </Request>
+            <Response>
+                <Step>
+                    <Name>AssignMessage.AddPayloadToPing</Name>
+                </Step>
+            </Response>
+            <Condition>proxy.pathsuffix MatchesPath "/user-role-service-v2-default-header"</Condition>
+        </Flow>
+        <Flow name="OptionsPreFlight">
+            <Request/>
+            <Response>
+                <Step>
+                    <Name>AssignMessage.AddCors</Name>
+                </Step>
+            </Response>
+            <Condition>(request.verb = "OPTIONS") and (request.header.origin != null) and (request.header.Access-Control-Request-Method != null)</Condition>
+        </Flow>
+        <Flow name="AddPayloadToPing">
+            <Description/>
+            <Request/>
+            <Response>
+                <Step>
+                    <Name>AssignMessage.AddPayloadToPing</Name>
+                </Step>
+            </Response>
+            <Condition>(proxy.pathsuffix MatchesPath "/_ping") and ((request.verb = "GET") or (request.verb = "HEAD"))</Condition>
+        </Flow>
+        <Flow name="StatusEndpoint">
+            <Request>
+                <Step>
+                    <Condition>request.header.apikey = null or private.common.status-endpoint-api-key != request.header.apikey</Condition>
+                    <Name>RaiseFault.401Unauthorized</Name>
+                </Step>
+                <Step>
+                    <Name>ServiceCallout.CallHealthcheckEndpoint</Name>
+                </Step>
+            </Request>
+            <Response>
+                <Step>
+                    <Name>javascript.SetStatusResponse</Name>
+                </Step>
+            </Response>
+            <Condition>(proxy.pathsuffix MatchesPath "/_status") and ((request.verb = "GET") or (request.verb = "HEAD"))
       </Condition>
-    </Flow>
-    <Flow name="SplunkTestEndpoint">
-      <Request>
+        </Flow>
+        <Flow name="SplunkTestEndpoint">
+            <Request>
+                <Step>
+                    <Name>OauthV2.VerifyAccessToken</Name>
+                </Step>
+                <Step>
+                    <Name>AssignMessage.Swap.RequestHeaders</Name>
+                </Step>
+            </Request>
+            <Condition>(proxy.pathsuffix MatchesPath "/splunk-test") and ((request.verb = "GET") or (request.verb = "HEAD"))</Condition>
+        </Flow>
+        <Flow name="ApiKeyProtectedEndpoint">
+            <Request>
+                <Step>
+                    <Name>VerifyApiKey.Apikey</Name>
+                </Step>
+            </Request>
+            <Condition>(proxy.pathsuffix MatchesPath "/apikey-protected") and ((request.verb = "GET") or (request.verb = "HEAD"))</Condition>
+        </Flow>
+        <Flow name="OpenAccessEndpoint">
+            <Condition>(proxy.pathsuffix MatchesPath "/open-access") and ((request.verb = "GET") or (request.verb = "HEAD"))</Condition>
+        </Flow>
+        <Flow name="ExtendedAttributes">
+            <Request>
+                <Step>
+                    <Name>OauthV2.VerifyAccessToken</Name>
+                </Step>
+                <Step>
+                    <Name>FlowCallout.ExtendedAttributes</Name>
+                </Step>
+            </Request>
+            <Response>
+                <Step>
+                    <Name>AssignMessage.AddPayloadToPing</Name>
+                </Step>
+            </Response>
+            <Condition>(proxy.pathsuffix MatchesPath "/extended-attributes") and ((request.verb = "GET") or (request.verb = "HEAD"))</Condition>
+        </Flow>
+        <Flow name="EnhancedVerifyApiKeyEndpoint">
+            <Request>
+                <Step>
+                    <Name>FlowCallout.EnhancedVerifyApiKey</Name>
+                </Step>
+            </Request>
+            <Condition>(proxy.pathsuffix MatchesPath "/enhanced-verify-api-key") and ((request.verb = "GET") or (request.verb = "HEAD"))</Condition>
+        </Flow>
+        <Flow name="SingleASIDApply">
+            <Description/>
+            <Request>
+                <Step>
+                    <Name>OauthV2.VerifyAccessToken</Name>
+                </Step>
+                <Step>
+                    <Name>FlowCalloutExtendedAttributes</Name>
+                </Step>
+                <Step>
+                    <Name>FlowCalloutSingleASIDApply</Name>
+                </Step>
+            </Request>
+            <Response/>
+            <Condition>(proxy.pathsuffix MatchesPath "/single-asid") and ((request.verb = "GET") or (request.verb = "HEAD"))</Condition>
+        </Flow>
+    </Flows>
+    <PreFlow>
+        <Request>
+            <Step>
+                <Name>AssignMessage.SetApimGuids</Name>
+            </Step>
+        </Request>
+    </PreFlow>
+    <PostClientFlow name="PostClientFlow">
+        <Response>
+            <Step>
+                <Name>FlowCallout.LogToSplunk</Name>
+            </Step>
+        </Response>
+    </PostClientFlow>
+    <HTTPProxyConnection>
+        <BasePath>shared-flow-testing</BasePath>
+        <VirtualHost>secure</VirtualHost>
+    </HTTPProxyConnection>
+    <RouteRule name="NoRoute">
+        <Condition>(request.verb = "OPTIONS") and (request.header.origin != null) and (request.header.Access-Control-Request-Method != null)</Condition>
+    </RouteRule>
+    <RouteRule name="NoRoutePing">
+        <Condition>(proxy.pathsuffix MatchesPath "/_ping") and ((request.verb = "GET") or (request.verb = "HEAD"))</Condition>
+    </RouteRule>
+    <RouteRule name="NoRouteStatus">
+        <Condition>(proxy.pathsuffix MatchesPath "/_status") and ((request.verb = "GET") or (request.verb = "HEAD"))</Condition>
+    </RouteRule>
+    <RouteRule name="NoRouteUserServiceRole">
+        <Condition>(proxy.pathsuffix MatchesPath "/user-role-service") and ((request.verb = "GET") or (request.verb = "HEAD"))</Condition>
+    </RouteRule>
+    <RouteRule name="NoRouteUserServiceRoleCustomHeader">
+        <Condition>(proxy.pathsuffix MatchesPath "/user-role-service-v2-custom-header") and ((request.verb = "GET") or (request.verb = "HEAD"))</Condition>
+    </RouteRule>
+    <RouteRule name="NoRouteUserServiceRoleDefaultHeader">
+        <Condition>(proxy.pathsuffix MatchesPath "/user-role-service-v2-default-header") and ((request.verb = "GET") or (request.verb = "HEAD"))</Condition>
+    </RouteRule>
+    <RouteRule name="NoRouteExtendedAttributes">
+        <Condition>(proxy.pathsuffix MatchesPath "/extended-attributes") and ((request.verb = "GET") or (request.verb = "HEAD"))</Condition>
+    </RouteRule>
+    <RouteRule name="NoRouteSingleASIDApply">
+        <Condition>(proxy.pathsuffix MatchesPath "/single-asid") and ((request.verb = "GET") or (request.verb = "HEAD"))</Condition>
+    </RouteRule>
+    <RouteRule name="shared-flow-testing-target">
+        <TargetEndpoint>shared-flow-testing-target</TargetEndpoint>
+    </RouteRule>
+    <DefaultFaultRule>
         <Step>
-          <Name>OauthV2.VerifyAccessToken</Name>
+            <Name>AssignMessage.Errors.CatchAllMessage</Name>
         </Step>
-        <Step>
-          <Name>AssignMessage.Swap.RequestHeaders</Name>
-        </Step>
-      </Request>
-      <Condition>(proxy.pathsuffix MatchesPath "/splunk-test") and ((request.verb = "GET") or (request.verb = "HEAD"))</Condition>
-    </Flow>
-    <Flow name="ApiKeyProtectedEndpoint">
-      <Request>
-        <Step>
-          <Name>VerifyApiKey.Apikey</Name>
-        </Step>
-      </Request>
-      <Condition>(proxy.pathsuffix MatchesPath "/apikey-protected") and ((request.verb = "GET") or (request.verb = "HEAD"))</Condition>
-    </Flow>
-    <Flow name="OpenAccessEndpoint">
-      <Condition>(proxy.pathsuffix MatchesPath "/open-access") and ((request.verb = "GET") or (request.verb = "HEAD"))</Condition>
-    </Flow>
-    <Flow name="ExtendedAttributes">
-      <Request>
-        <Step>
-          <Name>OauthV2.VerifyAccessToken</Name>
-        </Step>
-        <Step>
-          <Name>FlowCallout.ExtendedAttributes</Name>
-        </Step>
-      </Request>
-      <Response>
-        <Step>
-          <Name>AssignMessage.AddPayloadToPing</Name>
-        </Step>
-      </Response>
-      <Condition>(proxy.pathsuffix MatchesPath "/extended-attributes") and ((request.verb = "GET") or (request.verb = "HEAD"))</Condition>
-    </Flow>
-    <Flow name="EnhancedVerifyApiKeyEndpoint">
-      <Request>
-        <Step>
-          <Name>FlowCallout.EnhancedVerifyApiKey</Name>
-        </Step>
-      </Request>
-      <Condition>(proxy.pathsuffix MatchesPath "/enhanced-verify-api-key") and ((request.verb = "GET") or (request.verb = "HEAD"))</Condition>
-    </Flow>
-  </Flows>
-  <PreFlow/>
-  <PostClientFlow name="PostClientFlow">
-    <Response>
-      <Step>
-        <Name>FlowCallout.LogToSplunk</Name>
-      </Step>
-    </Response>
-  </PostClientFlow>
-  <HTTPProxyConnection>
-    <BasePath>{{ SERVICE_BASE_PATH }}</BasePath>
-    <VirtualHost>secure</VirtualHost>
-  </HTTPProxyConnection>
-  <RouteRule name="NoRoute">
-    <Condition>(request.verb = "OPTIONS") and (request.header.origin != null) and (request.header.Access-Control-Request-Method != null)</Condition>
-  </RouteRule>
-  <RouteRule name="NoRoutePing">
-    <Condition>(proxy.pathsuffix MatchesPath "/_ping") and ((request.verb = "GET") or (request.verb = "HEAD"))</Condition>
-  </RouteRule>
-  <RouteRule name="NoRouteStatus">
-    <Condition>(proxy.pathsuffix MatchesPath "/_status") and ((request.verb = "GET") or (request.verb = "HEAD"))</Condition>
-  </RouteRule>
-  <RouteRule name="NoRouteUserServiceRole">
-    <Condition>(proxy.pathsuffix MatchesPath "/user-role-service") and ((request.verb = "GET") or (request.verb = "HEAD"))</Condition>
-  </RouteRule>
-  <RouteRule name="NoRouteUserServiceRoleCustomHeader">
-    <Condition>(proxy.pathsuffix MatchesPath "/user-role-service-v2-custom-header") and ((request.verb = "GET") or (request.verb = "HEAD"))</Condition>
-  </RouteRule>
-  <RouteRule name="NoRouteUserServiceRoleDefaultHeader">
-    <Condition>(proxy.pathsuffix MatchesPath "/user-role-service-v2-default-header") and ((request.verb = "GET") or (request.verb = "HEAD"))</Condition>
-  </RouteRule>
-  <RouteRule name="NoRouteExtendedAttributes">
-    <Condition>(proxy.pathsuffix MatchesPath "/extended-attributes") and ((request.verb = "GET") or (request.verb = "HEAD"))</Condition>
-  </RouteRule>
-  <RouteRule name="shared-flow-testing-target">
-    <TargetEndpoint>shared-flow-testing-target</TargetEndpoint>
-  </RouteRule>
-  <DefaultFaultRule>
-    <Step>
-      <Name>AssignMessage.Errors.CatchAllMessage</Name>
-    </Step>
-  </DefaultFaultRule>
+    </DefaultFaultRule>
 </ProxyEndpoint>
